@@ -82,7 +82,7 @@ export default function AiLoadingPage() {
         {/* Header */}
         <header className="w-full top-0 sticky flex items-center justify-between px-5 py-4 bg-background z-50">
           <div className="flex items-center gap-2">
-            <span className="text-[28px] font-bold text-primary tracking-tight">NutriKos</span>
+            <span className="text-[28px] font-bold text-primary tracking-tight">EconoMeal</span>
           </div>
           <div className="flex items-center gap-4">
             <Bell className="w-6 h-6 text-primary hover:opacity-80 transition-opacity cursor-pointer" />

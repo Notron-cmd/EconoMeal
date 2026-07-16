@@ -67,7 +67,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-[12px] font-semibold text-on-surface-variant uppercase tracking-[0.05em] px-1">
                 Password
               </label>
@@ -105,7 +105,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-[15px] text-on-surface-variant">
-            New to NutriKos?{" "}
+            New to EconoMeal?{" "}
             <button
               onClick={() => router.push("/onboarding")}
               className="text-primary font-semibold hover:underline"

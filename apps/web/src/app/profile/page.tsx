@@ -29,7 +29,7 @@ export default function ProfilePage() {
               alt=""
             />
           </div>
-          <h1 className="text-[28px] font-bold text-primary tracking-tight">NutriKos</h1>
+          <h1 className="text-[28px] font-bold text-primary tracking-tight">EconoMeal</h1>
         </div>
         <button className="text-primary hover:opacity-80 transition-opacity active:scale-95">
           <Bell className="w-6 h-6" />
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                     <Info className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[17px] text-foreground">About NutriKos</p>
+                    <p className="text-[17px] text-foreground">About EconoMeal</p>
                     <p className="text-xs text-muted-foreground">Version 2.4.0 (Student Edition)</p>
                   </div>
                 </div>

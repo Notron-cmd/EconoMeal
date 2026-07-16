@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import {
-  ArrowLeft, MapPin, Pen, ChefHat, Microwave,
+  ArrowLeft, MapPin, ChefHat, Microwave,
   Utensils, Zap, Search, X, Check, ArrowRight,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -21,6 +21,8 @@ const suggestedPantry = ["Potato", "Carrots"]
 export default function PreferencesPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
+  const [province, setProvince] = useState("")
+  const [city, setCity] = useState("")
   const [equipment, setEquipment] = useState<string[]>(["Microwave"])
   const [allergies, setAllergies] = useState<string[]>(["Nut-Free"])
   const [pantry, setPantry] = useState<string[]>(["Rice", "Beans", "Pasta", "Olive Oil", "Garlic", "Onions"])
@@ -55,7 +57,7 @@ export default function PreferencesPage() {
       <div className="relative z-10 flex flex-col flex-1 px-5 py-8 overflow-y-auto">
         <header className="flex items-center justify-between mb-6">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push("/financial-setup")}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-90"
             aria-label="Go back"
           >
@@ -78,7 +80,7 @@ export default function PreferencesPage() {
               Fine-tune your diet.
             </h2>
             <p className="text-[15px] text-on-surface-variant leading-[22px] mt-2">
-              Help NutriKos understand your environment to suggest the best local and affordable recipes.
+              Help EconoMeal understand your environment to suggest the best local and affordable recipes.
             </p>
           </div>
 
@@ -86,19 +88,26 @@ export default function PreferencesPage() {
             <h3 className="text-[12px] font-semibold text-on-surface-variant uppercase tracking-wider mb-3">
               Your Location
             </h3>
-            <div className="relative w-full h-40 rounded-[1rem] overflow-hidden shadow-md">
-              <div
-                className="w-full h-full bg-cover bg-center"
-                style={{
-                  backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBaMH9Sg_EXfuE43KNjqlgcQL8P2NoKmkNPVKZYfS2FNrFjO1odlJfeog5miKzR2WUjtZksedxhwLkbtPofNl7Ze6VmRAlkS5jf-KvoiC7XicCTWQRwYe9c_THXEvD5vzR4j9dmdcETiEqXRDCGKv2GT7NxXM2UvotdZ85ciQZUt1XmssaHZ2Hl73lvxbMC3O_oPEOhVEV7exzQKaswtpvkTY2Ofeg4WZmJBsEZFDiaUGLYRAKGGBSWkA')",
-                }}
-              />
-              <div className="absolute inset-0 bg-black/5 flex items-end p-4 pointer-events-none">
-                <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 shadow-md pointer-events-auto cursor-pointer active:scale-95 transition-transform">
-                  <MapPin className="w-[18px] h-[18px] text-primary" />
-                  <span className="text-[15px] font-semibold">East London, UK</span>
-                  <Pen className="w-[18px] h-[18px] text-on-surface-variant" />
-                </div>
+            <div className="space-y-3">
+              <div className="relative flex items-center bg-surface-container-lowest rounded-2xl shadow-sm p-2 border-2 border-transparent transition-all focus-within:[box-shadow:0_0_0_2px_#006d36]">
+                <MapPin className="absolute left-4 w-5 h-5 text-primary" />
+                <input
+                  type="text"
+                  placeholder="Provinsi"
+                  value={province}
+                  onChange={(e) => setProvince(e.target.value)}
+                  className="w-full bg-transparent outline-none text-[15px] text-on-surface p-0 pl-12 h-10 placeholder:text-[#bccabb]"
+                />
+              </div>
+              <div className="relative flex items-center bg-surface-container-lowest rounded-2xl shadow-sm p-2 border-2 border-transparent transition-all focus-within:[box-shadow:0_0_0_2px_#006d36]">
+                <MapPin className="absolute left-4 w-5 h-5 text-primary" />
+                <input
+                  type="text"
+                  placeholder="Kabupaten / Kota"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full bg-transparent outline-none text-[15px] text-on-surface p-0 pl-12 h-10 placeholder:text-[#bccabb]"
+                />
               </div>
             </div>
           </div>
@@ -208,11 +217,17 @@ export default function PreferencesPage() {
           <div className="mt-6">
             <button
               onClick={() => router.push("/dashboard")}
-              className="w-full h-[56px] bg-gradient-to-b from-[#4ADE80] to-[#22C55E] text-white text-[17px] font-bold rounded-full shadow-md hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+              disabled={!province.trim() || !city.trim()}
+              className="w-full h-[56px] bg-gradient-to-b from-[#4ADE80] to-[#22C55E] text-white text-[17px] font-bold rounded-full shadow-md hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Continue
               <ArrowRight className="w-5 h-5" />
             </button>
+            {(!province.trim() || !city.trim()) && (
+              <p className="text-center text-[13px] text-error mt-2">
+                Isi provinsi dan kota terlebih dahulu
+              </p>
+            )}
             <p className="text-center text-[15px] text-outline mt-4">
               You can change these anytime in settings.
             </p>

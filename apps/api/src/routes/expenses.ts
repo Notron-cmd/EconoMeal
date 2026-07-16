@@ -11,7 +11,8 @@ expenses.use("*", authMiddleware)
 
 const expenseSchema = z.object({
   amount: z.number().positive(),
-  meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+  name: z.string().optional(),
+  meal_type: z.enum(["breakfast", "lunch", "dinner", "snack", "grocery", "other"]),
   note: z.string().optional(),
 })
 
@@ -37,6 +38,7 @@ expenses.post("/", zValidator("json", expenseSchema), async (c) => {
     .insert({
       user_id: user.id,
       amount: body.amount,
+      name: body.name,
       meal_type: body.meal_type,
       note: body.note,
     })

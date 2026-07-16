@@ -42,7 +42,7 @@ export default function RecommendationPage() {
             />
           </div>
         </div>
-        <h1 className="text-[28px] font-bold text-primary tracking-tight">NutriKos</h1>
+        <h1 className="text-[28px] font-bold text-primary tracking-tight">EconoMeal</h1>
         <button className="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform">
           <Bell className="w-6 h-6" />
         </button>

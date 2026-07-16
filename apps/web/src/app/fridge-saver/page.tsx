@@ -50,7 +50,7 @@ export default function FridgeSaverPage() {
               alt=""
             />
           </div>
-          <h1 className="text-primary tracking-tight font-bold text-2xl">NutriKos</h1>
+          <h1 className="text-primary tracking-tight font-bold text-2xl">EconoMeal</h1>
         </div>
         <button className="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform">
           <Bell className="w-6 h-6" />

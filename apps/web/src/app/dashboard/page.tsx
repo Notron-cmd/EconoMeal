@@ -29,7 +29,7 @@ export default function DashboardPage() {
               alt="User avatar"
             />
           </div>
-          <h1 className="text-[28px] leading-[34px] tracking-tight font-bold text-primary">NutriKos</h1>
+          <h1 className="text-[28px] leading-[34px] tracking-tight font-bold text-primary">EconoMeal</h1>
         </div>
         <button className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
           <Bell className="w-6 h-6" />

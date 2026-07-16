@@ -26,7 +26,7 @@ export default function SplashScreen() {
 
         <div className="mb-8 animate-fade-in" style={{ animationDelay: "0.3s" }}>
           <h1 className="text-[28px] leading-[34px] md:text-[32px] md:leading-[40px] font-bold text-primary tracking-tight mb-1">
-            NutriKos
+            EconoMeal
           </h1>
           <p className="text-[20px] leading-[28px] font-medium text-on-surface-variant opacity-90">
             Eat Smart. Save More.

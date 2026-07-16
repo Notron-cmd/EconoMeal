@@ -8,6 +8,8 @@ import financesRoutes from "./routes/finances"
 import expensesRoutes from "./routes/expenses"
 import fridgeRoutes from "./routes/fridge"
 import budgetRoutes from "./routes/budget"
+import recipesRoutes from "./routes/recipes"
+import streaksRoutes from "./routes/streaks"
 import type { Variables } from "./lib/types"
 
 const app = new Hono<{ Variables: Variables }>()
@@ -25,6 +27,8 @@ app.route("/api/finances", financesRoutes)
 app.route("/api/expenses", expensesRoutes)
 app.route("/api/fridge", fridgeRoutes)
 app.route("/api/budget", budgetRoutes)
+app.route("/api/recipes", recipesRoutes)
+app.route("/api/streaks", streaksRoutes)
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
 

@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ShoppingCart, PiggyBank, ChevronRight, Banknote, Loader2 } from "lucide-react"
+import { ShoppingCart, PiggyBank, Banknote, Loader2, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Input } from "@/components/ui/input"
 
 export default function FinancialSetupPage() {
   const router = useRouter()
@@ -96,14 +95,14 @@ export default function FinancialSetupPage() {
                   <Banknote className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <Input
+                  <input
                     id="monthly-income"
                     type="text"
                     inputMode="numeric"
                     placeholder="0"
                     value={form.monthlyIncome}
                     onChange={handleChange("monthlyIncome")}
-                    className="w-full bg-transparent border-none focus:ring-0 text-lg font-semibold text-on-surface p-0 h-auto shadow-none rounded-none placeholder:text-[#bccabb]"
+                    className="w-full bg-transparent outline-none text-lg font-semibold text-on-surface p-0 h-auto placeholder:text-[#bccabb]"
                   />
                 </div>
                 <span className="text-on-surface-variant text-xs font-semibold tracking-wider px-4 border-l border-surface-container-higher shrink-0">Rp</span>
@@ -119,14 +118,14 @@ export default function FinancialSetupPage() {
                   <ShoppingCart className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <Input
+                  <input
                     id="monthly-expenses"
                     type="text"
                     inputMode="numeric"
                     placeholder="0"
                     value={form.monthlyExpenses}
                     onChange={handleChange("monthlyExpenses")}
-                    className="w-full bg-transparent border-none focus:ring-0 text-lg font-semibold text-on-surface p-0 h-auto shadow-none rounded-none placeholder:text-[#bccabb]"
+                    className="w-full bg-transparent outline-none text-lg font-semibold text-on-surface p-0 h-auto placeholder:text-[#bccabb]"
                   />
                 </div>
                 <span className="text-on-surface-variant text-xs font-semibold tracking-wider px-4 border-l border-surface-container-higher shrink-0">Rp</span>
@@ -143,14 +142,14 @@ export default function FinancialSetupPage() {
                   <PiggyBank className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <Input
+                  <input
                     id="savings-goal"
                     type="text"
                     inputMode="numeric"
                     placeholder="0"
                     value={form.savingsGoal}
                     onChange={handleChange("savingsGoal")}
-                    className="w-full bg-transparent border-none focus:ring-0 text-lg font-semibold text-on-surface p-0 h-auto shadow-none rounded-none placeholder:text-[#bccabb]"
+                    className="w-full bg-transparent outline-none text-lg font-semibold text-on-surface p-0 h-auto placeholder:text-[#bccabb]"
                   />
                 </div>
                 <span className="text-on-surface-variant text-xs font-semibold tracking-wider px-4 border-l border-surface-container-higher shrink-0">Rp</span>
@@ -167,14 +166,11 @@ export default function FinancialSetupPage() {
               disabled={loading || !form.monthlyIncome}
             >
               {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="ml-2">Crunching numbers...</span>
-                </>
+                <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
                   <span>Calculate My Daily Budget</span>
-                  <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
@@ -186,16 +182,21 @@ export default function FinancialSetupPage() {
       </div>
 
       {loading && (
-        <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-          <div className="w-24 h-24 relative mb-6">
-            <div className="absolute inset-0 rounded-full border-4 border-surface-container-highest"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+        <div className="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-in fade-in duration-500">
+          <div className="w-28 h-28 relative mb-8">
+            <div className="absolute inset-0 rounded-full bg-primary/5 animate-ping" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-surface-container-highest" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-primary border-t-transparent animate-spin" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-4xl">calculate</span>
+              <div className="w-12 h-12 rounded-xl bg-primary-container/30 flex items-center justify-center animate-bounce">
+                <Banknote className="w-6 h-6 text-primary" />
+              </div>
             </div>
           </div>
-          <h2 className="text-lg font-semibold text-on-surface">Crunching numbers...</h2>
-          <p className="text-[15px] text-on-surface-variant mt-2">Analyzing your vitality potential.</p>
+          <div className="space-y-2 text-center animate-in slide-in-from-bottom-4 duration-700">
+            <h2 className="text-lg font-semibold text-on-surface">Calculating your daily budget</h2>
+            <p className="text-[15px] text-on-surface-variant/70">Finding the perfect balance for you.</p>
+          </div>
         </div>
       )}
     </div>

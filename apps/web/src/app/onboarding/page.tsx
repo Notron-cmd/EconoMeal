@@ -9,7 +9,7 @@ const slides = [
   {
     title: "Your Pocket Financial &\nNutrition Advisor",
     subtitle:
-      "NutriKos uses AI to plan your meals around your student budget.",
+      "EconoMeal uses AI to plan your meals around your student budget.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBjVN0804vtZNzzunta_UPEwaaH1XrTM_Bim3z7NWgIAREPdbR-jxBPe6UDRjm3aAQBbC6uueELV_hCnFYIswKr0UxrRJm4gXyfxeE63Ea5dOEUdzPCpeANok4Ut7TRm7K0fwjkShVGE53lPE4JEHHa2V-kG-s8hNMxDdWwM6xNp3jJjMGJuPqpiYGi2_M9dgu1W05SAU9saQQpCYJkgNo2XG4vPTc0e79GLp60buMoVgT2VdX5ucYykw",
   },
@@ -23,7 +23,7 @@ const slides = [
   {
     title: "Save While You Eat",
     subtitle:
-      "University life is expensive. NutriKos helps you reach your savings goals through smarter food choices.",
+      "University life is expensive. EconoMeal helps you reach your savings goals through smarter food choices.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCoqhHtBpnJ74cpfXEH2Ytm0WfF9htCCYNq9cP9MuP6y1yV08o3ozFUOFYDNZt7VViTWGTqpmyYmSd-lNYyl-lh-IiDfcTB-3JPiqJrBHgnsDMiuPUw3N4jpqwqn0xCNOq-utfcE50E_-gqV_MS0vDiZCfIQsz4nZYeBv-bCf10NjBKr7rfURAsPEbM7Au1RhJR2tWArYdajnE5xyEdWKiLGpsk78MhIVu0RpiRiFLZXv8AqcLYPVJx0g",
   },
@@ -65,7 +65,7 @@ export default function OnboardingPage() {
           className={`flex items-center ${isLast ? "justify-center" : "justify-between"} mb-4`}
         >
           <span className="text-[28px] font-bold text-primary tracking-tight leading-[34px]">
-            NutriKos
+            EconoMeal
           </span>
           {!isLast && (
             <button
@@ -231,7 +231,7 @@ export default function OnboardingPage() {
                 className={`rounded-full transition-all duration-300 ${
                   i === step
                     ? "w-8 h-2.5 bg-primary"
-                    : "w-2.5 h-2.5 bg-on-surface-variant/25"
+                    : "w-2.5 h-2.5 bg-on-surface-variant/40 ring-1 ring-inset ring-on-surface-variant/20"
                 }`}
               />
             ))}

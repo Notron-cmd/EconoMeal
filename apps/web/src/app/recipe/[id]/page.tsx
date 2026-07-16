@@ -42,7 +42,7 @@ export default function RecipeDetailPage() {
           <button onClick={() => router.back()} className="text-on-surface-variant cursor-pointer active:scale-95 transition-transform">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">NutriKos</span>
+          <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">EconoMeal</span>
         </div>
         <div className="flex items-center gap-md">
           <Bell className="w-6 h-6 text-primary hover:opacity-80 transition-opacity cursor-pointer" />

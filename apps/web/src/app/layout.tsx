@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NutriKos - Eat Smart. Save More.",
+  title: "EconoMeal - Eat Smart. Save More.",
   description:
     "AI-powered budget & nutrition planning assistant for students.",
   keywords: ["nutrition", "budget", "meal planning", "student", "AI"],
