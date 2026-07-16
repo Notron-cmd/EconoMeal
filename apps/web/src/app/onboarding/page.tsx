@@ -96,10 +96,10 @@ export default function OnboardingPage() {
             {slides.map((_, i) => (
               <div
                 key={i}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`rounded-full transition-all duration-300 ${
                   i === step
-                    ? "w-8 bg-primary"
-                    : "w-2 bg-outline-variant"
+                    ? "w-8 h-2.5 bg-primary"
+                    : "w-2.5 h-2.5 bg-on-surface-variant/25 ring-1 ring-inset ring-on-surface-variant/10"
                 }`}
               />
             ))}

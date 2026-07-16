@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { DollarSign, ShoppingCart, PiggyBank, ChevronRight, Loader2 } from "lucide-react"
+import { ShoppingCart, PiggyBank, ChevronRight, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,14 +20,24 @@ export default function FinancialSetupPage() {
   const totalSteps = 2
   const progress = (step / totalSteps) * 100
 
+  const formatRupiah = (value: string) => {
+    const digits = value.replace(/\D/g, "")
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+  }
+
+  const parseRupiah = (value: string) => value.replace(/\./g, "")
+
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [field]: e.target.value }))
+    const raw = e.target.value
+    const digits = raw.replace(/\D/g, "")
+    const formatted = formatRupiah(digits)
+    setForm((prev) => ({ ...prev, [field]: formatted }))
   }
 
   const handleCalculate = () => {
-    const income = Number(form.monthlyIncome)
-    const expenses = Number(form.monthlyExpenses)
-    const savings = Number(form.savingsGoal)
+    const income = Number(parseRupiah(form.monthlyIncome))
+    const expenses = Number(parseRupiah(form.monthlyExpenses))
+    const savings = Number(parseRupiah(form.savingsGoal))
 
     if (!income || income <= 0) return
 
@@ -74,13 +84,14 @@ export default function FinancialSetupPage() {
                   Monthly Income
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline" />
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[17px] font-bold text-outline">Rp</span>
                   <Input
-                    type="number"
-                    placeholder="0.00"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
                     value={form.monthlyIncome}
                     onChange={handleChange("monthlyIncome")}
-                    className="pl-12 text-lg font-semibold h-14"
+                    className="pl-14 text-lg font-semibold h-14"
                   />
                 </div>
               </div>
@@ -92,8 +103,9 @@ export default function FinancialSetupPage() {
                 <div className="relative">
                   <ShoppingCart className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline" />
                   <Input
-                    type="number"
-                    placeholder="0.00"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
                     value={form.monthlyExpenses}
                     onChange={handleChange("monthlyExpenses")}
                     className="pl-12 text-lg font-semibold h-14"
@@ -111,8 +123,9 @@ export default function FinancialSetupPage() {
                 <div className="relative">
                   <PiggyBank className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline" />
                   <Input
-                    type="number"
-                    placeholder="0.00"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
                     value={form.savingsGoal}
                     onChange={handleChange("savingsGoal")}
                     className="pl-12 text-lg font-semibold h-14"
