@@ -45,8 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(res.profile)
         })
         .catch(() => {
-          clearToken()
-          setTokenState(null)
+          // don't clear token — might be temporary (server restart)
         })
         .finally(() => setLoading(false))
     } else {

@@ -44,9 +44,10 @@ finances.post("/", zValidator("json", financeSchema), async (c) => {
 
   if (error) return c.json({ error: error.message }, 400)
 
-  const dailyBudget = (body.uang_bulanan - body.pengeluaran_tetap - body.target_tabungan) / 30
+  const raw = (body.uang_bulanan - body.pengeluaran_tetap - body.target_tabungan) / 30
+  const dailyBudget = Math.floor(raw / 1000) * 1000
 
-  return c.json({ ...data, daily_budget: Math.round(dailyBudget) })
+  return c.json({ ...data, daily_budget: dailyBudget })
 })
 
 finances.get("/daily", async (c) => {
@@ -60,7 +61,8 @@ finances.get("/daily", async (c) => {
 
   if (!data) return c.json({ daily_budget: 0 })
 
-  const daily = Math.round((data.uang_bulanan - data.pengeluaran_tetap - data.target_tabungan) / 30)
+  const raw = (data.uang_bulanan - data.pengeluaran_tetap - data.target_tabungan) / 30
+  const daily = Math.floor(raw / 1000) * 1000
 
   const today = new Date().toISOString().split("T")[0]
   const { data: spentData } = await supabase

@@ -27,12 +27,12 @@ budget.get("/weekly", async (c) => {
     .gte("logged_at", sevenDaysAgo)
     .order("logged_at", { ascending: true })
 
-  const daily = Math.round(
-    (Number(finance.uang_bulanan) - Number(finance.pengeluaran_tetap) - Number(finance.target_tabungan)) / 30
-  )
+  const monthlyBudget =
+    Number(finance.uang_bulanan) - Number(finance.pengeluaran_tetap) - Number(finance.target_tabungan)
+  const weeklyBudget = Math.floor(monthlyBudget / 4 / 1000) * 1000
+  const daily = Math.floor(monthlyBudget / 30 / 1000) * 1000
 
   const totalSpent = expenses?.reduce((sum, e) => sum + Number(e.amount), 0) ?? 0
-  const weeklyBudget = daily * 7
   const remaining = weeklyBudget - totalSpent
 
   return c.json({
@@ -67,7 +67,9 @@ budget.get("/monthly", async (c) => {
     .gte("logged_at", startOfMonth.toISOString())
 
   const totalSpent = expenses?.reduce((sum, e) => sum + Number(e.amount), 0) ?? 0
-  const monthlyBudget = Number(finance.uang_bulanan) - Number(finance.pengeluaran_tetap) - Number(finance.target_tabungan)
+  const monthlyBudget = Math.floor(
+    (Number(finance.uang_bulanan) - Number(finance.pengeluaran_tetap) - Number(finance.target_tabungan)) / 1000
+  ) * 1000
   const remaining = monthlyBudget - totalSpent
 
   return c.json({
