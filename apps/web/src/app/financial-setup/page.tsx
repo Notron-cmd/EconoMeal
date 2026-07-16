@@ -9,6 +9,7 @@ export default function FinancialSetupPage() {
   const router = useRouter()
   const [step] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [form, setForm] = useState({
     monthlyIncome: "",
     monthlyExpenses: "",
@@ -47,7 +48,8 @@ export default function FinancialSetupPage() {
         target_tabungan: savings,
       })
       router.push("/preferences")
-    } catch {
+    } catch (err) {
+      setError((err as Error).message)
       setLoading(false)
     }
   }
@@ -74,7 +76,7 @@ export default function FinancialSetupPage() {
           <section className="mt-6 mb-6">
             <h1 className="text-[28px] font-bold text-on-surface tracking-tight mb-1">Financial Setup</h1>
             <p className="text-[15px] text-on-surface-variant leading-[22px]">
-              Let&apos;s build your vitality budget. We&apos;ll help you find the balance between living well and saving smart.
+              Budget makan harian = (Income - Expenses - Tabungan) / 30. Kami akan bantu kamu makan hemat tanpa kelaparan.
             </p>
           </section>
 
@@ -137,7 +139,7 @@ export default function FinancialSetupPage() {
                 </div>
                 <span className="text-on-surface-variant text-xs font-semibold tracking-wider px-4 border-l border-surface-container-higher shrink-0">Rp</span>
               </div>
-              <p className="text-[11px] text-on-surface-variant/70 italic ml-1">Include rent, groceries, and subscriptions.</p>
+              <p className="text-[11px] text-on-surface-variant/70 italic ml-1">Biaya tetap non-makanan: kos, transport, token listrik, dll.</p>
             </div>
 
             <div className="space-y-2">
@@ -161,12 +163,16 @@ export default function FinancialSetupPage() {
                 </div>
                 <span className="text-on-surface-variant text-xs font-semibold tracking-wider px-4 border-l border-surface-container-higher shrink-0">Rp</span>
               </div>
+              <p className="text-[11px] text-on-surface-variant/70 italic ml-1">Jumlah yang ingin kamu tabung setiap bulan.</p>
             </div>
           </div>
 
           <div className="flex-1 min-h-[32px]"></div>
 
           <div className="mt-auto pt-6">
+            {error && (
+              <p className="text-destructive text-[13px] text-center mb-3">{error}</p>
+            )}
             <button
               className="w-full h-14 bg-gradient-to-b from-[#4ADE80] to-[#006d36] text-white rounded-full text-lg font-semibold shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleCalculate}
@@ -176,13 +182,13 @@ export default function FinancialSetupPage() {
                 <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
-                  <span>Calculate My Daily Budget</span>
+                  <span>Hitung Budget Makan Harian</span>
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
             <p className="text-center mt-4 text-on-surface-variant text-[13px] opacity-60">
-              We&apos;ll use this to optimize your recipe suggestions.
+              Budget ini yang akan dipakai buat rekomendasi resep dan tracking pengeluaran.
             </p>
           </div>
         </main>
@@ -201,8 +207,8 @@ export default function FinancialSetupPage() {
             </div>
           </div>
           <div className="space-y-2 text-center animate-in slide-in-from-bottom-4 duration-700">
-            <h2 className="text-lg font-semibold text-on-surface">Calculating your daily budget</h2>
-            <p className="text-[15px] text-on-surface-variant/70">Finding the perfect balance for you.</p>
+            <h2 className="text-lg font-semibold text-on-surface">Menghitung budget makan harian</h2>
+            <p className="text-[15px] text-on-surface-variant/70">Sisanya untuk uang makan sehari-hari.</p>
           </div>
         </div>
       )}
