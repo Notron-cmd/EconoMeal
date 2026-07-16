@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/shared/Logo"
 import { useAuth } from "@/hooks/useAuth"
+import { api } from "@/lib/api"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -30,7 +31,12 @@ export default function LoginPage() {
       } else {
         await register(form.email, form.password, form.name || undefined)
       }
-      router.push("/financial-setup")
+      const finance = await api.get<{ id?: string }>("/api/finances")
+      if (finance?.id) {
+        router.push("/dashboard")
+      } else {
+        router.push("/financial-setup")
+      }
     } catch (err) {
       setError((err as Error).message)
     } finally {
