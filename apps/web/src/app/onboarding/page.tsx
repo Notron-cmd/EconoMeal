@@ -41,7 +41,7 @@ export default function OnboardingPage() {
 
   const handleNext = () => {
     if (isLast) {
-      router.push("/financial-setup")
+      router.push("/login")
     } else {
       setStep((s) => s + 1)
     }
@@ -59,7 +59,7 @@ export default function OnboardingPage() {
           <Logo className="w-10 h-10" />
           {!isLast && (
             <button
-              onClick={() => router.push("/financial-setup")}
+              onClick={() => router.push("/login")}
               className="text-sm font-semibold text-on-surface-variant"
             >
               SKIP
