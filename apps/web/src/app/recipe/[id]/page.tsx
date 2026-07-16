@@ -1,27 +1,28 @@
 "use client"
 
 import { useState } from "react"
-import { Timer, DollarSign, Zap, Check, ChefHat, Lightbulb, ArrowLeft, Plus, Minus, Leaf } from "lucide-react"
+import { ArrowLeft, Bell, Clock, CheckCircle, Circle, Bot, UtensilsCrossed, Minus, Plus, Wallet } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { BottomNav } from "@/components/shared/BottomNav"
 
-const tabs = ["Ingredients", "Steps", "Nutrition"] as const
+const tabs = ["INGREDIENTS", "STEPS", "NUTRITION"] as const
 
 const ingredients = [
-  { name: "Red Lentils", amount: "1 cup", checked: false },
-  { name: "Coconut Milk", amount: "1/2 can", checked: false },
-  { name: "Fresh Ginger", amount: "1 tbsp", checked: false },
-  { name: "Turmeric Powder", amount: "1 tsp", checked: false },
-  { name: "Sweet Potato", amount: "1 large", checked: false },
-  { name: "Spinach", amount: "2 cups", checked: false },
+  { name: "Red Lentils", amount: "1 cup" },
+  { name: "Coconut Milk", amount: "1/2 can" },
+  { name: "Fresh Ginger", amount: "1 tbsp" },
+  { name: "Turmeric Powder", amount: "1 tsp" },
+]
+
+const steps = [
+  "Rinse red lentils under cold water until the water runs clear. Set aside.",
+  "In a large pot, sauté onion and ginger for 5 minutes until soft and fragrant.",
+  "Add spices, lentils, and 3 cups of water. Simmer for 15-20 minutes until lentils are soft.",
 ]
 
 export default function RecipeDetailPage() {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<string>("Ingredients")
+  const [activeTab, setActiveTab] = useState<string>("INGREDIENTS")
   const [servings, setServings] = useState(2)
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set())
 
@@ -35,209 +36,205 @@ export default function RecipeDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="relative h-64 w-full overflow-hidden">
-        <div
-          className="w-full h-full bg-cover bg-center"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=400&fit=crop')",
-          }}
-        />
-        <div className="absolute top-4 left-4">
-          <button
-            onClick={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-sm"
-          >
-            <ArrowLeft className="w-5 h-5 text-on-surface" />
+    <div className="min-h-screen bg-background text-on-background font-body-md pb-32">
+      <header className="w-full top-0 sticky z-40 bg-background flex items-center justify-between px-container-padding py-md">
+        <div className="flex items-center gap-md">
+          <button onClick={() => router.back()} className="text-on-surface-variant cursor-pointer active:scale-95 transition-transform">
+            <ArrowLeft className="w-6 h-6" />
           </button>
+          <span className="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight">NutriKos</span>
         </div>
-        <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1 text-sm font-semibold shadow-sm">
-          <Timer className="w-4 h-4 text-primary" />
-          25 MIN
-        </div>
-      </div>
-
-      <div className="px-5 pt-4 pb-4 space-y-5">
-        {/* Title & Description */}
-        <div>
-          <h1 className="text-[28px] font-bold text-on-surface leading-tight mb-1">Golden Red Lentil Dahl</h1>
-          <p className="text-[15px] text-on-surface-variant leading-[22px]">
-            High-protein, vegan comfort food that&apos;s easy on the wallet.
-          </p>
-        </div>
-
-        {/* Cost & Impact */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <DollarSign className="w-6 h-6 text-secondary" />
-              <div>
-                <p className="text-xs font-semibold text-on-surface-variant">Estimated Cost</p>
-                <p className="text-lg font-bold text-on-surface">$2.50</p>
-                <p className="text-[10px] text-on-surface-variant">per serving</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3">
-              <Lightbulb className="w-6 h-6 text-primary" />
-              <div>
-                <p className="text-xs font-semibold text-on-surface-variant">Budget Impact</p>
-                <p className="text-lg font-bold text-primary">-15%</p>
-                <p className="text-[10px] text-on-surface-variant">Daily Goal</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Nutrition Bar */}
-        <div className="flex justify-between bg-surface-container-low rounded-xl px-4 py-3">
-          <div className="text-center">
-            <p className="text-lg font-bold text-on-surface">340</p>
-            <p className="text-[10px] font-semibold text-on-surface-variant">Kcal</p>
+        <div className="flex items-center gap-md">
+          <Bell className="w-6 h-6 text-primary hover:opacity-80 transition-opacity cursor-pointer" />
+          <div className="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+            <img className="w-full h-full object-cover" alt="User avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3CuaJ6rrTxpdToH4zWOaibiStxHwA5tqAlYuGs0axK5MdnMDX87tAVD5MEZxxYmRSVoKiku7cj6dQ9GmjpY3XepYSIacKssByDnJgNUsLa0_W-Uih6znE1GAccF9BwW3PbWvAeRlmjSXx85hOqnfJM4wiQ_hdqZoYfEgwRUI6lgaAnHxslh5bfiNvrpH1vcdkzp8gIF65dIukuq85xIg1aouKKsK7qc4c-zaHS4HBhmMwPsIcCanVIw" />
           </div>
-          <div className="text-center">
-            <p className="text-lg font-bold text-on-surface">18g</p>
-            <p className="text-[10px] font-semibold text-on-surface-variant">Protein</p>
-          </div>
-          <div className="text-center">
-            <p className="text-lg font-bold text-on-surface">42g</p>
-            <p className="text-[10px] font-semibold text-on-surface-variant">Carbs</p>
-          </div>
-          <div className="text-center">
-            <p className="text-lg font-bold text-on-surface">6g</p>
-            <p className="text-[10px] font-semibold text-on-surface-variant">Fats</p>
+        </div>
+      </header>
+
+      <main className="max-w-md mx-auto">
+        <div className="relative w-full aspect-[4/3] px-container-padding mt-sm">
+          <div className="w-full h-full rounded-lg overflow-hidden soft-card-shadow relative">
+            <img className="w-full h-full object-cover" alt="Golden Red Lentil Dahl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZTMGw0HMN_MJv-U0fN6A6_AAIddLAtjDWO6qCVHLBmCf3FDNiI-zJWj15ibK4MJY-YLh11IY4gBOk-VV-lD1nUEVFbuJIsQD6Prfvndv6fQRXgU-j9RUmWdMyuaVoyG_bDG9TuyyZ7xXEObyBqjj-Wq3fWci2lhku_2hEewPaFEsmXoyKfU2vNXs58PHeL0PaHBNwHtsn13Y8qFf18dIveaZsuB3Xfq9KpaREmnjlqN1K-u1V7K5Dbg" />
+            <div className="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur-md px-md py-xs rounded-full flex items-center gap-xs">
+              <Clock className="w-[18px] h-[18px] text-primary" />
+              <span className="font-label-caps text-on-surface-variant">25 MIN</span>
+            </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-border">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 pb-3 text-sm font-semibold transition-colors ${
-                activeTab === tab
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-on-surface-variant"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        <section className="px-container-padding mt-lg space-y-md">
+          <div>
+            <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xs">Golden Red Lentil Dahl</h1>
+            <p className="font-body-md text-on-surface-variant">High-protein, vegan comfort food that&apos;s easy on the wallet.</p>
+          </div>
 
-        {/* Ingredients Tab */}
-        {activeTab === "Ingredients" && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-on-surface-variant">Serves {servings}</p>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setServings(Math.max(1, servings - 1))}
-                  className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="font-bold text-on-surface">{servings}</span>
-                <button
-                  onClick={() => setServings(servings + 1)}
-                  className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+          <div className="grid grid-cols-2 gap-md">
+            <div className="bg-surface-container-lowest p-md rounded-lg soft-card-shadow flex flex-col justify-between">
+              <span className="font-label-caps text-on-surface-variant uppercase">Estimated Cost</span>
+              <div className="mt-sm">
+                <span className="text-headline-lg-mobile font-bold text-primary">$2.50</span>
+                <p className="text-[12px] text-on-surface-variant mt-xs">Per serving</p>
               </div>
             </div>
-
-            <div className="space-y-2">
-              {ingredients.map((item, idx) => (
-                <button
-                  key={item.name}
-                  onClick={() => toggleCheck(idx)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                    checkedItems.has(idx) ? "opacity-50" : "hover:bg-surface-container"
-                  }`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                      checkedItems.has(idx)
-                        ? "bg-primary border-primary text-on-primary"
-                        : "border-outline"
-                    }`}
-                  >
-                    {checkedItems.has(idx) && <Check className="w-3.5 h-3.5" />}
-                  </div>
-                  <span
-                    className={`text-[15px] ${
-                      checkedItems.has(idx)
-                        ? "line-through text-on-surface-variant"
-                        : "text-on-surface"
-                    }`}
-                  >
-                    {item.amount} {item.name}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* AI Budget Tip */}
-            <div className="flex items-start gap-3 p-4 bg-primary-container/20 rounded-xl border border-primary-container/30">
-              <Lightbulb className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-bold text-primary mb-0.5">AI Budget Tip</p>
-                <p className="text-xs text-on-surface-variant leading-relaxed">
-                  Buy lentils in bulk to save $0.50 more next time. They have a 12-month shelf life!
-                </p>
+            <div className="bg-surface-container-lowest p-md rounded-lg soft-card-shadow flex flex-col justify-between">
+              <span className="font-label-caps text-on-surface-variant uppercase">Budget Impact</span>
+              <div className="mt-sm">
+                <span className="text-headline-lg-mobile font-bold text-secondary">-15%</span>
+                <p className="text-[12px] text-on-surface-variant mt-xs">Daily Goal</p>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Steps Tab */}
-        {activeTab === "Steps" && (
-          <div className="space-y-4">
-            {[
-              "Rinse red lentils and chop sweet potato into cubes.",
-              "Sauté ginger and turmeric in oil until fragrant.",
-              "Add lentils, sweet potato, coconut milk, and simmer for 20 min.",
-            ].map((step, idx) => (
-              <div key={idx} className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center text-sm font-bold shrink-0">
-                  {idx + 1}
-                </div>
-                <p className="text-[15px] text-on-surface leading-[22px] pt-1">{step}</p>
-              </div>
+          <div className="bg-surface-container p-md rounded-lg flex justify-around items-center">
+            <div className="text-center">
+              <p className="font-bold text-on-surface">340</p>
+              <p className="text-[11px] text-on-surface-variant uppercase font-semibold">Kcal</p>
+            </div>
+            <div className="w-[1px] h-8 bg-outline-variant" />
+            <div className="text-center">
+              <p className="font-bold text-on-surface">18g</p>
+              <p className="text-[11px] text-on-surface-variant uppercase font-semibold">Protein</p>
+            </div>
+            <div className="w-[1px] h-8 bg-outline-variant" />
+            <div className="text-center">
+              <p className="font-bold text-on-surface">42g</p>
+              <p className="text-[11px] text-on-surface-variant uppercase font-semibold">Carbs</p>
+            </div>
+            <div className="w-[1px] h-8 bg-outline-variant" />
+            <div className="text-center">
+              <p className="font-bold text-on-surface">6g</p>
+              <p className="text-[11px] text-on-surface-variant uppercase font-semibold">Fats</p>
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-xl border-b border-surface-container-high px-container-padding sticky top-[72px] bg-background/90 backdrop-blur-sm z-30">
+          <div className="flex gap-xl overflow-x-auto no-scrollbar">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`font-label-caps py-md transition-all whitespace-nowrap ${
+                  activeTab === tab
+                    ? "text-primary border-b-[3px] border-primary"
+                    : "text-on-surface-variant opacity-60"
+                }`}
+              >
+                {tab}
+              </button>
             ))}
           </div>
-        )}
+        </div>
 
-        {/* Nutrition Tab */}
-        {activeTab === "Nutrition" && (
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-semibold text-on-surface">Protein</span>
-                <span className="text-sm text-on-surface-variant">18g / 50g</span>
+        <div className="px-container-padding py-lg min-h-[400px]">
+          {activeTab === "INGREDIENTS" && (
+            <div className="space-y-md">
+              <div className="flex items-center justify-between mb-sm">
+                <span className="font-title-md text-title-md text-on-surface">Serves {servings}</span>
+                <div className="flex bg-surface-container rounded-full p-xs">
+                  <button
+                    onClick={() => setServings(Math.max(1, servings - 1))}
+                    className="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center font-bold text-primary active:scale-90 transition-transform"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-10 flex items-center justify-center font-bold">{servings}</span>
+                  <button
+                    onClick={() => setServings(servings + 1)}
+                    className="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center font-bold text-primary active:scale-90 transition-transform"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <Progress value={36} className="h-3" />
-            </div>
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-sm font-semibold text-on-surface">Budget Used</span>
-                <span className="text-sm text-on-surface-variant">$2.50 / $15.00</span>
-              </div>
-              <Progress value={16} className="h-3 [&>div]:bg-secondary" />
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* Bottom Action */}
-      <div className="fixed bottom-16 left-0 right-0 px-5 z-30">
-        <Button size="lg" className="w-full text-[17px] font-bold">
-          <Check className="w-5 h-5" />
+              <ul className="space-y-sm">
+                {ingredients.map((item, idx) => (
+                  <li
+                    key={item.name}
+                    className="flex items-center justify-between p-md bg-surface-container-lowest rounded-lg border border-surface-container-high"
+                  >
+                    <button onClick={() => toggleCheck(idx)} className="flex items-center gap-md">
+                      {checkedItems.has(idx) ? (
+                        <CheckCircle className="w-6 h-6 text-primary" />
+                      ) : (
+                        <Circle className="w-6 h-6 text-outline" />
+                      )}
+                      <span className={`font-body-md ${checkedItems.has(idx) ? "line-through text-on-surface-variant" : "text-on-surface"}`}>
+                        {item.name}
+                      </span>
+                    </button>
+                    <span className="text-on-surface-variant font-semibold">{item.amount}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-xl bg-surface-container-low p-lg rounded-lg relative overflow-hidden">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-sm mb-sm text-primary">
+                    <Bot className="w-5 h-5" />
+                    <span className="font-label-caps">AI BUDGET TIP</span>
+                  </div>
+                  <p className="font-body-md text-on-surface-variant leading-relaxed">
+                    Buy lentils in <span className="font-bold text-primary">bulk</span> to save $0.50 more next time. They have a 12-month shelf life!
+                  </p>
+                </div>
+                <div className="absolute -right-8 -bottom-8 opacity-5 text-primary scale-[4]">
+                  <Wallet className="w-[80px] h-[80px]" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "STEPS" && (
+            <div className="space-y-lg">
+              {steps.map((step, idx) => (
+                <div key={idx} className="flex gap-md">
+                  <span className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 font-bold">
+                    {idx + 1}
+                  </span>
+                  <p className="font-body-md text-on-surface">{step}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === "NUTRITION" && (
+            <div className="space-y-md">
+              <div className="bg-surface-container-lowest p-lg rounded-lg soft-card-shadow">
+                <h3 className="font-title-md text-on-surface mb-md">Daily Values</h3>
+                <div className="space-y-lg">
+                  <div>
+                    <div className="flex justify-between mb-xs">
+                      <span className="font-label-caps">PROTEIN</span>
+                      <span className="font-bold">18g / 50g</span>
+                    </div>
+                    <div className="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+                      <div className="h-full bg-primary w-[36%] rounded-full" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-xs">
+                      <span className="font-label-caps">BUDGET</span>
+                      <span className="font-bold">$2.50 / $15.00</span>
+                    </div>
+                    <div className="h-[18px] w-full bg-surface-container rounded-full overflow-hidden">
+                      <div className="h-full bg-secondary w-[16%] rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <div className="fixed bottom-[72px] w-full bg-background/80 backdrop-blur-xl p-container-padding z-50">
+        <button className="w-full h-[56px] pill-gradient text-on-primary rounded-full font-bold text-lg active:scale-95 transition-transform soft-card-shadow flex items-center justify-center gap-md">
+          <UtensilsCrossed className="w-5 h-5" />
           Mark as Cooked
-        </Button>
+        </button>
       </div>
 
       <BottomNav />

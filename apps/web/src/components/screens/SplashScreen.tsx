@@ -24,20 +24,20 @@ export default function SplashScreen() {
           </div>
         </div>
 
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-          <h1 className="text-[28px] md:text-[32px] font-bold text-primary tracking-tight mb-1 md:leading-[40px] md:tracking-[-0.01em]">
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <h1 className="text-[28px] leading-[34px] md:text-[32px] md:leading-[40px] font-bold text-primary tracking-tight mb-1">
             NutriKos
           </h1>
-          <p className="text-[20px] font-semibold text-on-surface-variant opacity-90 md:leading-[28px]">
+          <p className="text-[20px] leading-[28px] font-medium text-on-surface-variant opacity-90">
             Eat Smart. Save More.
           </p>
         </div>
 
         <div
-          className="w-full max-w-sm bg-white/40 backdrop-blur-xl p-6 rounded-[1rem] shadow-lg mb-6 animate-float"
+          className="w-full max-w-sm bg-white/40 backdrop-blur-xl p-6 rounded-xl shadow-lg mb-8 animate-fade-in animate-float"
           style={{ animationDelay: "0.5s" }}
         >
-          <div className="relative h-48 w-full rounded-[1rem] overflow-hidden bg-surface-container-low mb-4">
+          <div className="relative h-48 w-full rounded-md overflow-hidden bg-surface-container-low mb-4">
             <div
               className="w-full h-full bg-cover bg-center"
               style={{
@@ -45,7 +45,7 @@ export default function SplashScreen() {
               }}
             />
           </div>
-          <p className="text-on-surface-variant text-[15px] leading-[22px] px-1">
+          <p className="text-on-surface-variant text-[15px] leading-[22px] px-2">
             Fuel your studies without breaking the bank. Personalized recipes and
             budget tracking at your fingertips.
           </p>
@@ -53,14 +53,14 @@ export default function SplashScreen() {
 
         <div className="w-full max-w-xs space-y-4 animate-fade-in" style={{ animationDelay: "0.7s" }}>
           <Button
-            size="lg"
-            className="w-full text-[17px] font-bold"
+            size="default"
+            className="w-full font-bold text-[17px] shadow-lg active:scale-95"
             onClick={() => router.push("/onboarding")}
           >
             Get Started
             <ArrowRight className="w-5 h-5" />
           </Button>
-          <p className="text-[12px] font-semibold text-on-surface-variant uppercase tracking-[0.05em] opacity-60">
+          <p className="text-[12px] leading-[16px] font-semibold text-on-surface-variant uppercase tracking-widest opacity-60">
             Join 5,000+ students today
           </p>
         </div>

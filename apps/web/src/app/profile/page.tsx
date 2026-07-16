@@ -1,24 +1,18 @@
 "use client"
 
-import { useState } from "react"
 import {
-  User,
+  Bell,
   Edit2,
+  DollarSign,
   TrendingUp,
-  Flame,
-  Wallet,
-  PiggyBank,
-  Apple,
+  Ban,
   ChefHat,
   MapPin,
-  DollarSign,
+  Info,
   LogOut,
   ChevronRight,
-  Info,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { BottomNav } from "@/components/shared/BottomNav"
 
 export default function ProfilePage() {
@@ -26,148 +20,159 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <div className="px-5 pt-8">
-        {/* Profile Hero */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative mb-3">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-3xl font-bold text-on-primary shadow-lg">
-              AT
-            </div>
-            <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-card border-2 border-background flex items-center justify-center shadow-sm">
-              <Edit2 className="w-4 h-4 text-on-surface-variant" />
-            </button>
+      <header className="w-full top-0 sticky z-50 bg-background flex items-center justify-between px-5 py-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
+            <img
+              className="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj-fAucQ5WCqWGcxsxXaraKNiXYU664FwYldFcProCNQqo3saniet5ryvSDgU1jJdPp-mHkSiOxkpLKkGlTiOb1c69UZ8N72e_B5z8gkPPmdzohVU1kEnbiPUAyNh8hKGzUObWJamKpxCk95aEmepUOxBmk4pY_kaXlXa9WCX_bq94kCU346puTeENPQi50VnhPy31zmZimMrbVvA7UfO3UiDU5JA4FCf7CsTIBvtNiBnh8hbIbnWmaQ"
+              alt=""
+            />
           </div>
-          <h2 className="text-[24px] font-bold text-on-surface">Alex Thompson</h2>
-          <p className="text-sm text-on-surface-variant">Economics Major - $450 Monthly Budget</p>
+          <h1 className="text-[28px] font-bold text-primary tracking-tight">NutriKos</h1>
         </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-8">
-          <Card>
-            <CardContent className="p-5 text-center">
-              <div className="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center mx-auto mb-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-2xl font-bold text-on-surface">$124.50</p>
-              <p className="text-xs font-semibold text-on-surface-variant">SAVED THIS MONTH</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-5 text-center">
-              <div className="w-10 h-10 rounded-full bg-secondary-container/30 flex items-center justify-center mx-auto mb-2">
-                <Flame className="w-5 h-5 text-secondary" />
-              </div>
-              <p className="text-2xl font-bold text-on-surface">12</p>
-              <p className="text-xs font-semibold text-on-surface-variant">STREAK</p>
-            </CardContent>
-          </Card>
+        <button className="text-primary hover:opacity-80 transition-opacity active:scale-95">
+          <Bell className="w-6 h-6" />
+        </button>
+      </header>
+      <main className="max-w-md mx-auto px-5 mt-6">
+        <section className="flex flex-col items-center text-center mb-8">
+          <div className="relative mb-4">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-lg">
+              <img
+                className="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs4-VJy-OrUe76xD9nRWrAKFyUN8aWYiHCC1mwdIlQjLRpln_wLf6sHy0yjwuUbmME8dLMmLocBRJhjxPdAEPm8AfeGZYZYaxt7eO5RlyYMIW_z_OFyT1D6gZnR7iKDa-738igUCfqmlLO6CuThuU-vxg2p8sA-yEZVarghx-pptIZgneBPuEUiLpe6Av__sOu0TPaPhLY3A11y5ZHCG1h1Dz4yYH5Srm8Hcn3CKafKMZWSrGDlj1iHw"
+                alt=""
+              />
+            </div>
+            <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-1 rounded-full border-2 border-card flex items-center justify-center">
+              <Edit2 className="w-4 h-4" />
+            </div>
+          </div>
+          <h2 className="text-[28px] font-bold text-foreground">Alex Thompson</h2>
+          <p className="text-[15px] text-muted-foreground">Economics Major &bull; $450 Monthly Budget</p>
+        </section>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-card p-4 rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] flex flex-col gap-1">
+            <span className="text-xs font-semibold tracking-[0.05em] text-muted-foreground opacity-70">SAVED THIS MONTH</span>
+            <span className="text-xl font-semibold text-primary">$124.50</span>
+          </div>
+          <div className="bg-card p-4 rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] flex flex-col gap-1">
+            <span className="text-xs font-semibold tracking-[0.05em] text-muted-foreground opacity-70">STREAK</span>
+            <span className="text-xl font-semibold text-secondary">12 Days</span>
+          </div>
         </div>
-
-        {/* Settings */}
-        <div className="space-y-6 mb-8">
-          {/* Financial Settings */}
-          <div>
-            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Financial Settings</p>
-            <div className="space-y-1">
-              <SettingRow
-                icon={Wallet}
-                label="Income & Budget"
-                description="Manage monthly allowances"
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">FINANCIAL SETTINGS</h3>
+            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
+              <button
                 onClick={() => router.push("/financial-setup")}
-              />
-              <SettingRow
-                icon={PiggyBank}
-                label="Savings Goals"
-                description="Set and track progress"
-              />
+                className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-primary">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] text-foreground">Income &amp; Budget</p>
+                    <p className="text-xs text-muted-foreground">Manage monthly allowances</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-border" />
+              </button>
+              <div className="h-[1px] bg-border mx-4"></div>
+              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-primary">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] text-foreground">Savings Goals</p>
+                    <p className="text-xs text-muted-foreground">Set and track progress</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-border" />
+              </button>
             </div>
           </div>
-
-          {/* Preferences */}
-          <div>
-            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Preferences</p>
-            <div className="space-y-1">
-              <SettingRow
-                icon={Apple}
-                label="Allergies & Restrictions"
-                description="Nut-free, Gluten-free, Vegan"
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">PREFERENCES</h3>
+            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
+              <button
                 onClick={() => router.push("/preferences")}
-              />
-              <SettingRow
-                icon={ChefHat}
-                label="Kitchen Equipment"
-                description="Air fryer, Microwave, Hot plate"
-              />
+                className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[#895024]">
+                    <Ban className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] text-foreground">Allergies &amp; Restrictions</p>
+                    <p className="text-xs text-muted-foreground">Nut-free, Gluten-free, Vegan</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-border" />
+              </button>
+              <div className="h-[1px] bg-border mx-4"></div>
+              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[#895024]">
+                    <ChefHat className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] text-foreground">Kitchen Equipment</p>
+                    <p className="text-xs text-muted-foreground">Air fryer, Microwave, Hot plate</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-border" />
+              </button>
             </div>
           </div>
-
-          {/* Regional */}
-          <div>
-            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Regional</p>
-            <SettingRow
-              icon={MapPin}
-              label="Regional Pricing"
-              description="Boston, MA - US Dollar"
-            />
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">REGIONAL</h3>
+            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
+              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] text-foreground">Regional Pricing</p>
+                    <p className="text-xs text-muted-foreground">Boston, MA &bull; US Dollar</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-border" />
+              </button>
+            </div>
           </div>
-
-          {/* Support */}
-          <div>
-            <p className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Support</p>
-            <SettingRow
-              icon={Info}
-              label="About NutriKos"
-              description="Version 2.4.0 - Student Edition"
-            />
+          <div className="flex flex-col gap-2">
+            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">SUPPORT</h3>
+            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
+              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                    <Info className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] text-foreground">About NutriKos</p>
+                    <p className="text-xs text-muted-foreground">Version 2.4.0 (Student Edition)</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-border" />
+              </button>
+            </div>
           </div>
+          <button className="w-full h-14 bg-destructive/10 text-destructive font-semibold rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform mt-6 mb-8 shadow-sm">
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+          <p className="text-center text-xs font-semibold tracking-[0.05em] text-muted-foreground opacity-40 mb-6">
+            NUTRITION ON A BUDGET &bull; EST. 2024
+          </p>
         </div>
-
-        {/* Logout */}
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full border-destructive/30 text-destructive hover:bg-destructive/5"
-          onClick={() => router.push("/")}
-        >
-          <LogOut className="w-5 h-5" />
-          Logout
-        </Button>
-
-        <p className="text-center text-[10px] font-semibold text-on-surface-variant tracking-[0.05em] mt-6 mb-4">
-          NUTRITION ON A BUDGET - EST. 2024
-        </p>
-      </div>
+      </main>
       <BottomNav />
     </div>
-  )
-}
-
-function SettingRow({
-  icon: Icon,
-  label,
-  description,
-  onClick,
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  description: string
-  onClick?: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center justify-between p-4 rounded-xl bg-card hover:bg-surface-container-high transition-colors"
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
-          <Icon className="w-5 h-5 text-on-surface-variant" />
-        </div>
-        <div className="text-left">
-          <p className="text-sm font-semibold text-on-surface">{label}</p>
-          <p className="text-xs text-on-surface-variant">{description}</p>
-        </div>
-      </div>
-      <ChevronRight className="w-5 h-5 text-on-surface-variant" />
-    </button>
   )
 }

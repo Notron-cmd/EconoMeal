@@ -1,150 +1,154 @@
 "use client"
 
 import {
-  Sparkles,
-  ChefHat,
+  Bell,
+  Bot,
+  UtensilsCrossed,
   Receipt,
   Refrigerator,
-  TrendingDown,
-  Zap,
-  Apple,
+  ArrowRight,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { BottomNav } from "@/components/shared/BottomNav"
 
 export default function DashboardPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="px-5 pt-8 pb-4">
-        {/* Hero Budget Card */}
-        <Card className="bg-gradient-to-br from-primary to-primary/80 text-on-primary mb-6 shadow-lg">
-          <CardContent className="p-6">
-            <p className="text-sm font-semibold opacity-80 uppercase tracking-wider mb-1">
-              Today&apos;s Food Budget
-            </p>
-            <p className="text-4xl font-bold mb-1">$15.00</p>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm opacity-80">
-                Remaining: <span className="font-bold">$8.50</span>
-              </p>
-              <span className="text-xs font-semibold opacity-80">56.6%</span>
-            </div>
-            <Progress value={56.6} className="h-3 bg-white/20 [&>div]:bg-white" />
-            <p className="text-xs font-medium opacity-80 mt-2 flex items-center gap-1">
-              <TrendingDown className="w-3.5 h-3.5" />
-              On track to save $45 this month
-            </p>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-secondary/5 pb-32">
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+      `}</style>
 
-        {/* AI Recommendation Entry */}
-        <Card
-          className="mb-6 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => router.push("/ai-loading")}
-        >
-          <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-14 h-14 rounded-[1rem] bg-gradient-to-br from-primary-light to-primary flex items-center justify-center shadow-md shrink-0">
-              <Sparkles className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-on-surface">Ask AI for Recommendation</p>
-              <p className="text-sm text-on-surface-variant truncate">
-                &ldquo;What can I cook with the eggs and spinach in my fridge?&rdquo;
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Nutrition Summary */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card>
-            <CardContent className="p-4 flex flex-col items-center text-center">
-              <Apple className="w-6 h-6 text-primary mb-1" />
-              <p className="text-2xl font-bold text-on-surface">1.2k</p>
-              <p className="text-xs text-on-surface-variant">Calories</p>
-              <p className="text-[10px] text-on-surface-variant">60% of goal</p>
-              <div className="w-full h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
-                <div className="h-full rounded-full bg-primary" style={{ width: "60%" }} />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex flex-col items-center text-center">
-              <Zap className="w-6 h-6 text-secondary mb-1" />
-              <p className="text-2xl font-bold text-on-surface">45g</p>
-              <p className="text-xs text-on-surface-variant">Protein</p>
-              <p className="text-[10px] text-on-surface-variant">target 80g</p>
-              <div className="w-full h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
-                <div className="h-full rounded-full bg-secondary" style={{ width: "56%" }} />
-              </div>
-            </CardContent>
-          </Card>
+      <header className="w-full top-0 sticky z-40 bg-background flex items-center justify-between px-5 py-4">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-surface-container">
+            <img
+              className="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuIx_OsMtlqvBxsZGXb77BX8FLapb1NkUGfhBdE_Qs_l_tmgMebOktxVzN1_Pu5si9rWM_6AqV-cIyWKIgh7pZvC1UPg9Dxk_d2I7tL9q9zwXVycEQaX7AveAFLuxAxxTpM3xdTo21WbkryT70QOfIolOEv5EK0oEaI7L2YoQvSAiTaunPLOaUAuynXvJjewk8HiXBypNWFgMT_TuHusVkeaPtJKVF1KYPIsMuYFAZGuMFT3qjwgk_Hg"
+              alt="User avatar"
+            />
+          </div>
+          <h1 className="text-[28px] leading-[34px] tracking-tight font-bold text-primary">NutriKos</h1>
         </div>
+        <button className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+          <Bell className="w-6 h-6" />
+        </button>
+      </header>
 
-        {/* Quick Actions */}
-        <p className="text-sm font-semibold text-on-surface mb-3">Quick Actions</p>
-        <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
-          <QuickActionCard
-            icon={Refrigerator}
-            label="Fridge Saver"
-            onClick={() => router.push("/fridge-saver")}
-          />
-          <QuickActionCard
-            icon={ChefHat}
-            label="View Recipes"
-            onClick={() => router.push("/recipes")}
-          />
-          <QuickActionCard
-            icon={Receipt}
-            label="Expense Log"
-            onClick={() => router.push("/expense-log")}
-          />
-        </div>
-
-        {/* Smart Saver Tip */}
-        <Card className="bg-gradient-to-r from-secondary/10 to-secondary/5 border-secondary/20">
-          <CardContent className="p-4 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center shrink-0">
-              <TrendingDown className="w-5 h-5 text-secondary" />
-            </div>
+      <main className="px-5 space-y-6 pt-2">
+        <section className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 space-y-4">
+          <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-semibold text-on-surface mb-0.5">Smart Saver Tip</p>
-              <p className="text-xs text-on-surface-variant leading-relaxed">
-                Buying bulk grains instead of pre-packaged boxes could save you $12 this week.
-              </p>
+              <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1">TODAY&apos;S FOOD BUDGET</p>
+              <h2 className="text-[40px] leading-[48px] tracking-tight font-bold text-primary">$15.00</h2>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="text-right">
+              <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1">REMAINING</p>
+              <h2 className="text-[32px] leading-[40px] tracking-tight font-bold text-primary">$8.50</h2>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[15px] leading-[22px] text-on-surface-variant italic">You&apos;re in control.</span>
+              <span className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-primary">SAVINGS PROGRESS</span>
+            </div>
+            <div className="bg-[#f4f4f5] rounded-full h-[18px] overflow-hidden">
+              <div className="h-full bg-gradient-to-b from-[#4ADE80] to-[#22C55E] rounded-full" style={{ width: "56.6%" }}></div>
+            </div>
+            <p className="text-center text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mt-1">On track to save $45 this month</p>
+          </div>
+        </section>
+
+        <section className="relative py-4">
+          <button
+            onClick={() => router.push("/ai-loading")}
+            className="w-full bg-gradient-to-b from-[#4ADE80] to-[#22C55E] shadow-[0_0_20px_rgba(74,222,128,0.3)] p-6 rounded-[1rem] flex items-center justify-between text-white active:scale-95 transition-transform"
+          >
+            <div className="text-left">
+              <h3 className="text-[20px] leading-[28px] font-semibold leading-tight">Ask AI for Recommendation</h3>
+              <p className="text-white/80 text-[15px] leading-[22px] mt-1">&ldquo;What can I cook with the eggs and spinach in my fridge?&rdquo;</p>
+            </div>
+            <div className="bg-white/20 p-4 rounded-full">
+              <Bot className="w-8 h-8" />
+            </div>
+          </button>
+        </section>
+
+        <section className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
+            <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant uppercase">Calories</p>
+            <div className="relative w-16 h-16 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#f4f4f5" strokeWidth="6" />
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#006d36" strokeDasharray="175" strokeDashoffset="45" strokeWidth="6" />
+              </svg>
+              <span className="absolute text-[20px] leading-[28px] font-semibold">1.2k</span>
+            </div>
+            <p className="text-[15px] leading-[22px] text-on-surface-variant">60% of goal</p>
+          </div>
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
+            <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant uppercase">Protein</p>
+            <div className="relative w-16 h-16 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#f4f4f5" strokeWidth="6" />
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#fd933d" strokeDasharray="175" strokeDashoffset="100" strokeWidth="6" />
+              </svg>
+              <span className="absolute text-[20px] leading-[28px] font-semibold">45g</span>
+            </div>
+            <p className="text-[15px] leading-[22px] text-on-surface-variant">Target: 80g</p>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="text-[20px] leading-[28px] font-semibold text-on-surface px-2">Quick Actions</h3>
+          <div className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+            <button
+              onClick={() => router.push("/fridge-saver")}
+              className="min-w-[140px] bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-start gap-4 active:scale-95 transition-transform cursor-pointer shrink-0"
+            >
+              <div className="bg-[#4ade80]/20 p-2 rounded-lg text-primary">
+                <Refrigerator className="w-6 h-6" />
+              </div>
+              <p className="text-[17px] leading-[24px] font-semibold text-on-surface">Fridge Saver</p>
+            </button>
+            <button
+              onClick={() => router.push("/recipes")}
+              className="min-w-[140px] bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-start gap-4 active:scale-95 transition-transform cursor-pointer shrink-0"
+            >
+              <div className="bg-[#fd933d]/20 p-2 rounded-lg text-secondary">
+                <UtensilsCrossed className="w-6 h-6" />
+              </div>
+              <p className="text-[17px] leading-[24px] font-semibold text-on-surface">View Recipes</p>
+            </button>
+            <button
+              onClick={() => router.push("/expense-log")}
+              className="min-w-[140px] bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-start gap-4 active:scale-95 transition-transform cursor-pointer shrink-0"
+            >
+              <div className="bg-[#dde5da] p-2 rounded-lg text-on-surface-variant">
+                <Receipt className="w-6 h-6" />
+              </div>
+              <p className="text-[17px] leading-[24px] font-semibold text-on-surface">Expense Log</p>
+            </button>
+          </div>
+        </section>
+
+        <section className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden flex flex-col">
+          <div
+            className="h-32 bg-cover bg-center"
+            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDoflnyFCln-FY0fWabwJVivE_mKRSC7yE1p1F-rRDnqKuG5ZnyUX3jzkVwJ0Vj1j31-BJuHYPxzTXJLbDM3BMI9k0Xyu45bPCPuFiuB6z8HFOkm8yH3MRlst3dOHKhpibEtotZ29Hn-gU-pbO-VpJmPcbaywST-K6okCJSZNou6yHtV5-uyFft1rdruh927pLvYki8HrclCbOKwb5cyRv3hZ528fMvkkemQV6VnMD2JJ4NPICikX5ETA')" }}
+          ></div>
+          <div className="p-6">
+            <h4 className="text-[20px] leading-[28px] font-semibold text-on-surface">Smart Saver Tip</h4>
+            <p className="text-[15px] leading-[22px] text-on-surface-variant mt-2">Buying bulk grains instead of pre-packaged boxes could save you $12 this week. Want to add to your grocery list?</p>
+            <button className="mt-4 text-primary text-[20px] leading-[28px] font-semibold flex items-center gap-1">
+              Show me more <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </section>
+      </main>
 
       <BottomNav />
     </div>
-  )
-}
-
-function QuickActionCard({
-  icon: Icon,
-  label,
-  onClick,
-}: {
-  icon: React.ComponentType<{ className?: string }>
-  label: string
-  onClick?: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex flex-col items-center gap-2 p-4 rounded-[1rem] bg-card shadow-sm min-w-[100px] hover:shadow-md transition-shadow"
-    >
-      <div className="w-12 h-12 rounded-[0.75rem] bg-surface-container-low flex items-center justify-center">
-        <Icon className="w-6 h-6 text-primary" />
-      </div>
-      <span className="text-xs font-semibold text-on-surface">{label}</span>
-    </button>
   )
 }
