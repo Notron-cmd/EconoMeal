@@ -8,27 +8,15 @@ import {
   TrendingDown,
   Zap,
   Apple,
-  Home,
-  BookOpen,
-  Bot,
-  Wallet,
-  User,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { BottomNav } from "@/components/shared/BottomNav"
 
 export default function DashboardPage() {
   const router = useRouter()
-
-  const navItems = [
-    { icon: Home, label: "Home", active: true },
-    { icon: BookOpen, label: "Recipes" },
-    { icon: Bot, label: "AI Scan" },
-    { icon: Wallet, label: "Budget" },
-    { icon: User, label: "Profile" },
-  ]
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -134,24 +122,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-5 py-2 z-50">
-        <div className="flex items-center justify-between max-w-lg mx-auto">
-          {navItems.map((item) => (
-            <button
-              key={item.label}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors ${
-                item.active
-                  ? "text-primary"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="text-[10px] font-semibold">{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   )
 }

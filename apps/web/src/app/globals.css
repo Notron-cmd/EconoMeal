@@ -104,3 +104,9 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
