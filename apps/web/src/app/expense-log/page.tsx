@@ -1,28 +1,67 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, CheckCircle, Coffee, Pizza, ShoppingBasket } from "lucide-react"
+import { ArrowLeft, CheckCircle, Coffee, Pizza, ShoppingBasket, Loader2 } from "lucide-react"
 import { BottomNav } from "@/components/shared/BottomNav"
+import { useExpenses, useCreateExpense, useWeeklyBudget } from "@/hooks/useData"
+import type { Expense } from "@/lib/types"
 
 const mealTypes = ["Breakfast", "Lunch", "Dinner", "Snack"] as const
-
-const recentPurchases = [
-  { name: "Artisan Pizza Co.", amount: 12.4, type: "Dinner", time: "Today, 6:30 PM", icon: Pizza, iconClass: "text-secondary" },
-  { name: "Campus Brew", amount: 4.2, type: "Snack", time: "Yesterday, 10:15 AM", icon: Coffee, iconClass: "text-[#895024]" },
-  { name: "Fresh Market", amount: 38.15, type: "Grocery", time: "Jan 14, 2:00 PM", icon: ShoppingBasket, iconClass: "text-primary" },
-]
+const mealTypeMap: Record<string, string> = {
+  Breakfast: "breakfast",
+  Lunch: "lunch",
+  Dinner: "dinner",
+  Snack: "snack",
+}
+const typeIcons: Record<string, { icon: React.ElementType; color: string }> = {
+  Dinner: { icon: Pizza, color: "text-secondary" },
+  Snack: { icon: Coffee, color: "text-[#895024]" },
+  Grocery: { icon: ShoppingBasket, color: "text-primary" },
+  Lunch: { icon: Coffee, color: "text-[#895024]" },
+  Breakfast: { icon: Coffee, color: "text-[#895024]" },
+}
+const fallbackIcon = { icon: ShoppingBasket, color: "text-primary" }
 
 export default function ExpenseLogPage() {
   const [amount, setAmount] = useState("")
   const [mealType, setMealType] = useState("Breakfast")
   const [note, setNote] = useState("")
 
-  const initialBudget = 142.5
-  const weeklyLimit = 250
-  const val = parseFloat(amount) || 0
-  const remaining = Math.max(0, initialBudget - val)
-  const usedBudget = weeklyLimit - remaining
-  const percentage = Math.min(100, (usedBudget / weeklyLimit) * 100)
+  const { data: expenses, isLoading: expLoading } = useExpenses()
+  const { data: weekly } = useWeeklyBudget()
+  const createExpense = useCreateExpense()
+
+  const weeklyBudget = weekly?.weekly_budget ?? 0
+  const weeklySpent = weekly?.total_spent ?? 0
+  const weeklyRemaining = Math.max(0, weeklyBudget - weeklySpent)
+  const percentage = weeklyBudget > 0 ? Math.min(100, Math.round((weeklySpent / weeklyBudget) * 100)) : 0
+
+  const handleLog = async () => {
+    const val = parseFloat(amount)
+    if (!val || val <= 0) return
+    try {
+      await createExpense.mutateAsync({
+        amount: val,
+        name: note || undefined,
+        meal_type: mealTypeMap[mealType] || "other",
+        note: note || undefined,
+      })
+      setAmount("")
+      setNote("")
+    } catch {
+      // ignore
+    }
+  }
+
+  const timeAgo = (loggedAt: string) => {
+    const d = new Date(loggedAt)
+    const now = new Date()
+    const diff = now.getTime() - d.getTime()
+    const days = Math.floor(diff / 86400000)
+    if (days === 0) return "Today"
+    if (days === 1) return "Yesterday"
+    return `${days} days ago`
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-32">
@@ -43,32 +82,32 @@ export default function ExpenseLogPage() {
           <div className="bg-card p-6 rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <span className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">Remaining Budget</span>
-              <span className={`text-xl font-semibold ${remaining <= 0 ? "text-destructive" : "text-primary"}`}>
-                ${remaining.toFixed(2)}
+              <span className={`text-xl font-semibold ${weeklyRemaining <= 0 ? "text-destructive" : "text-primary"}`}>
+                Rp {weeklyRemaining.toLocaleString("id-ID")}
               </span>
             </div>
             <div className="h-4 w-full bg-[#e2ebe0] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ease-out ${
-                  remaining <= 0
+                  weeklyRemaining <= 0
                     ? "bg-gradient-to-r from-[#ffdad6] to-destructive"
                     : "bg-gradient-to-r from-primary-light to-primary"
                 }`}
                 style={{ width: `${percentage}%` }}
               />
             </div>
-            <p className="text-muted-foreground text-sm opacity-70">Based on your $250.00 weekly limit.</p>
+            <p className="text-muted-foreground text-sm opacity-70">Based on your Rp {weeklyBudget.toLocaleString("id-ID")} weekly limit.</p>
           </div>
         </section>
 
         <section className="flex flex-col items-center justify-center py-6 gap-2">
           <label className="text-xs font-semibold tracking-widest uppercase text-muted-foreground">ENTER AMOUNT</label>
           <div className="relative flex items-center">
-            <span className="text-[40px] leading-[48px] font-bold tracking-[-0.02em] text-primary -mr-1">$</span>
+            <span className="text-[40px] leading-[48px] font-bold tracking-[-0.02em] text-primary -mr-1">Rp</span>
             <input
               type="number"
-              placeholder="0.00"
-              step="0.01"
+              placeholder="0"
+              step="100"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className="bg-transparent border-none text-[40px] leading-[48px] font-bold tracking-[-0.02em] text-foreground focus:ring-0 w-48 text-center placeholder:opacity-20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -97,41 +136,55 @@ export default function ExpenseLogPage() {
         <section className="mb-8">
           <input
             type="text"
-            placeholder="Add a note (e.g. Whole Foods Salad)"
+            placeholder="Merchant name (e.g. Warung Makmur)"
             value={note}
             onChange={(e) => setNote(e.target.value)}
             className="w-full bg-[#e2ebe0] border-none rounded-[1rem] px-4 py-4 focus:ring-2 focus:ring-primary text-[15px] leading-[22px] placeholder:text-muted-foreground/50"
           />
         </section>
 
-        <button className="w-full h-14 bg-gradient-to-b from-[#4ADE80] to-[#22C55E] text-white text-xl font-semibold rounded-full shadow-[0px_10px_30px_rgba(28,25,23,0.04)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          Log Expense
+        <button
+          onClick={handleLog}
+          disabled={!amount || parseFloat(amount) <= 0 || createExpense.isPending}
+          className="w-full h-14 bg-gradient-to-b from-[#4ADE80] to-[#22C55E] text-white text-xl font-semibold rounded-full shadow-[0px_10px_30px_rgba(28,25,23,0.04)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {createExpense.isPending ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              <CheckCircle className="w-5 h-5" />
+              Log Expense
+            </>
+          )}
         </button>
 
         <section className="mt-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-foreground">Recent Purchases</h3>
-            <button className="text-primary text-xs font-semibold tracking-widest uppercase hover:underline transition-all">SEE ALL</button>
           </div>
           <div className="flex flex-col gap-2">
-            {recentPurchases.map((purchase) => {
-              const Icon = purchase.icon
+            {expLoading && <p className="text-center text-muted-foreground">Loading...</p>}
+            {expenses?.length === 0 && !expLoading && (
+              <p className="text-center text-muted-foreground">No expenses yet</p>
+            )}
+            {expenses?.map((purchase: Expense) => {
+              const iconData = typeIcons[purchase.meal_type] ?? typeIcons[purchase.meal_type.charAt(0).toUpperCase() + purchase.meal_type.slice(1)] ?? fallbackIcon
+              const Icon = iconData.icon
               return (
                 <div
-                  key={purchase.name}
+                  key={purchase.id}
                   className="bg-card p-4 rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] flex items-center justify-between group transition-all hover:translate-x-1"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-lg bg-[#e2ebe0] flex items-center justify-center">
-                      <Icon className={`w-6 h-6 ${purchase.iconClass}`} />
+                      <Icon className={`w-6 h-6 ${iconData.color}`} />
                     </div>
                     <div>
-                      <p className="text-xl font-semibold text-sm text-foreground">{purchase.name}</p>
-                      <p className="text-xs text-muted-foreground">{purchase.type} • {purchase.time}</p>
+                      <p className="text-xl font-semibold text-sm text-foreground">{purchase.name || purchase.meal_type}</p>
+                      <p className="text-xs text-muted-foreground">{purchase.meal_type} &bull; {timeAgo(purchase.logged_at)}</p>
                     </div>
                   </div>
-                  <span className="text-xl font-semibold text-foreground">-${purchase.amount.toFixed(2)}</span>
+                  <span className="text-xl font-semibold text-foreground">-Rp{purchase.amount.toLocaleString("id-ID")}</span>
                 </div>
               )
             })}

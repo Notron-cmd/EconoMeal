@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ShoppingCart, PiggyBank, Banknote, Loader2, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { api } from "@/lib/api"
 
 export default function FinancialSetupPage() {
   const router = useRouter()
@@ -31,7 +32,7 @@ export default function FinancialSetupPage() {
     setForm((prev) => ({ ...prev, [field]: formatted }))
   }
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const income = Number(parseRupiah(form.monthlyIncome))
     const expenses = Number(parseRupiah(form.monthlyExpenses))
     const savings = Number(parseRupiah(form.savingsGoal))
@@ -39,10 +40,16 @@ export default function FinancialSetupPage() {
     if (!income || income <= 0) return
 
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    try {
+      await api.post("/api/finances", {
+        uang_bulanan: income,
+        pengeluaran_tetap: expenses,
+        target_tabungan: savings,
+      })
       router.push("/preferences")
-    }, 1500)
+    } catch {
+      setLoading(false)
+    }
   }
 
   return (

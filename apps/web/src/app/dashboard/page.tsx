@@ -10,9 +10,20 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
+import { useDailyBudget, useMonthlyBudget, useSaverTips } from "@/hooks/useData"
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { data: daily } = useDailyBudget()
+  const { data: monthly } = useMonthlyBudget()
+  const { data: tips } = useSaverTips()
+
+  const dailyBudget = daily?.daily_budget ?? 0
+  const dailyRemaining = daily?.remaining ?? 0
+  const dailyPercentage = daily?.percentage ?? 0
+  const savingProgress = monthly?.percentage ?? 0
+  const savingsAmount = monthly ? (monthly.total_spent > 0 ? monthly.monthly_budget - monthly.total_spent : monthly.monthly_budget) : 0
+  const tip = tips?.[0]
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-secondary/5 pb-32">
@@ -41,11 +52,15 @@ export default function DashboardPage() {
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1">TODAY&apos;S FOOD BUDGET</p>
-              <h2 className="text-[40px] leading-[48px] tracking-tight font-bold text-primary">$15.00</h2>
+              <h2 className="text-[40px] leading-[48px] tracking-tight font-bold text-primary">
+                Rp {dailyBudget.toLocaleString("id-ID")}
+              </h2>
             </div>
             <div className="text-right">
               <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1">REMAINING</p>
-              <h2 className="text-[32px] leading-[40px] tracking-tight font-bold text-primary">$8.50</h2>
+              <h2 className="text-[32px] leading-[40px] tracking-tight font-bold text-primary">
+                Rp {dailyRemaining.toLocaleString("id-ID")}
+              </h2>
             </div>
           </div>
           <div className="space-y-2">
@@ -54,9 +69,11 @@ export default function DashboardPage() {
               <span className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-primary">SAVINGS PROGRESS</span>
             </div>
             <div className="bg-[#f4f4f5] rounded-full h-[18px] overflow-hidden">
-              <div className="h-full bg-gradient-to-b from-[#4ADE80] to-[#22C55E] rounded-full" style={{ width: "56.6%" }}></div>
+              <div className="h-full bg-gradient-to-b from-[#4ADE80] to-[#22C55E] rounded-full" style={{ width: `${Math.min(savingProgress, 100)}%` }}></div>
             </div>
-            <p className="text-center text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mt-1">On track to save $45 this month</p>
+            <p className="text-center text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mt-1">
+              {monthly ? `Spent Rp ${monthly.total_spent.toLocaleString("id-ID")} of Rp ${monthly.monthly_budget.toLocaleString("id-ID")}` : ""}
+            </p>
           </div>
         </section>
 
@@ -140,7 +157,7 @@ export default function DashboardPage() {
           ></div>
           <div className="p-6">
             <h4 className="text-[20px] leading-[28px] font-semibold text-on-surface">Smart Saver Tip</h4>
-            <p className="text-[15px] leading-[22px] text-on-surface-variant mt-2">Buying bulk grains instead of pre-packaged boxes could save you $12 this week. Want to add to your grocery list?</p>
+            <p className="text-[15px] leading-[22px] text-on-surface-variant mt-2">{tip?.tip_text ?? "Track your spending to discover saving opportunities."}</p>
             <button className="mt-4 text-primary text-[20px] leading-[28px] font-semibold flex items-center gap-1">
               Show me more <ArrowRight className="w-5 h-5" />
             </button>

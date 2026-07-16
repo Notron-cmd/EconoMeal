@@ -1,24 +1,43 @@
 "use client"
 
-import { useState } from "react"
-import { Search, Bot, Plus, Egg, CookingPot, ChefHat, Sparkles, Bell } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Search, Bot, Plus, Egg, CookingPot, ChefHat, Sparkles, Bell, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
+import { useFridgeSuggestions, useSaveFridge } from "@/hooks/useData"
+import type { PriceInfo } from "@/lib/types"
 
-const initialIngredients = ["Eggs", "Rice", "Onions", "Spinach"]
-const suggestedIngredients = ["Tomato", "Salmon", "Chicken", "Tofu", "Carrots", "Potato"]
+const suggestedIngredients = ["Tomato", "Salmon", "Chicken", "Tofu", "Carrots", "Potato", "Eggs", "Rice", "Onions", "Spinach", "Garlic", "Chili"]
+
+const ingredientIcons: Record<string, { icon: React.ReactNode; bg: string }> = {
+  Eggs: { icon: <Egg className="w-5 h-5 text-amber-600" />, bg: "bg-amber-50" },
+  Rice: { icon: <CookingPot className="w-5 h-5 text-slate-600" />, bg: "bg-slate-50" },
+  Onions: { icon: <ChefHat className="w-5 h-5 text-purple-600" />, bg: "bg-purple-50" },
+  Spinach: { icon: <span className="text-green-600 text-lg">🥬</span>, bg: "bg-green-50" },
+}
 
 export default function FridgeSaverPage() {
   const router = useRouter()
   const [search, setSearch] = useState("")
-  const [ingredients, setIngredients] = useState(initialIngredients)
-  const [selected, setSelected] = useState<string[]>([])
+  const [ingredients, setIngredients] = useState<string[]>(["Eggs", "Rice", "Onions", "Spinach"])
 
-  const toggleIngredient = (item: string) => {
-    setSelected((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
-    )
-  }
+  const { data: suggestions, isLoading } = useFridgeSuggestions()
+  const saveFridge = useSaveFridge()
+
+  useEffect(() => {
+    if (suggestions?.ingredients && suggestions.ingredients.length > 0) {
+      setIngredients(suggestions.ingredients)
+    }
+  }, [suggestions])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (ingredients.length > 0) {
+        saveFridge.mutate(ingredients)
+      }
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [ingredients])
 
   const addIngredient = (item: string) => {
     if (!ingredients.includes(item)) {
@@ -27,20 +46,16 @@ export default function FridgeSaverPage() {
     setSearch("")
   }
 
+  const removeIngredient = (item: string) => {
+    setIngredients((prev) => prev.filter((i) => i !== item))
+  }
+
   const filteredSuggestions = suggestedIngredients.filter(
     (i) => !ingredients.includes(i) && i.toLowerCase().includes(search.toLowerCase())
   )
 
-  const ingredientIcons: Record<string, { icon: React.ReactNode; bg: string }> = {
-    Eggs: { icon: <Egg className="w-5 h-5 text-amber-600" />, bg: "bg-amber-50" },
-    Rice: { icon: <CookingPot className="w-5 h-5 text-slate-600" />, bg: "bg-slate-50" },
-    Onions: { icon: <ChefHat className="w-5 h-5 text-purple-600" />, bg: "bg-purple-50" },
-    Spinach: { icon: <span className="text-green-600 text-lg">🥬</span>, bg: "bg-green-50" },
-  }
-
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
       <header className="w-full top-0 sticky z-40 bg-background flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
@@ -58,7 +73,6 @@ export default function FridgeSaverPage() {
       </header>
 
       <main className="px-6 pt-4">
-        {/* Hero */}
         <div className="mb-8">
           <h2 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">
             What&apos;s in your fridge?
@@ -68,19 +82,17 @@ export default function FridgeSaverPage() {
           </p>
         </div>
 
-        {/* AI Scan Animation Placeholder */}
         <div className="relative w-full h-48 mb-8 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_0_rgba(0,109,54,0.05)] flex items-center justify-center">
           <div className="relative z-10 flex flex-col items-center text-center p-6">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(0,109,54,0.2)] animate-pulse">
               <Bot className="w-8 h-8 text-primary" />
             </div>
             <span className="text-sm font-bold text-primary tracking-widest uppercase">
-              Smart Sensing Active
+              {isLoading ? "Loading..." : "Smart Sensing Active"}
             </span>
           </div>
         </div>
 
-        {/* Search Bar */}
         <div className="relative mb-8 group">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="w-5 h-5 text-primary" />
@@ -108,39 +120,48 @@ export default function FridgeSaverPage() {
           )}
         </div>
 
-        {/* Ingredient Chips Grid */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-lg text-foreground">Your Ingredients</h3>
             <span className="text-sm text-primary font-medium">{ingredients.length} Items</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {ingredients.map((item) => {
-              const info = ingredientIcons[item] || { icon: <ChefHat className="w-5 h-5 text-slate-600" />, bg: "bg-gray-50" }
-              const isSelected = selected.includes(item)
-              return (
-                <div
-                  key={item}
-                  onClick={() => toggleIngredient(item)}
-                  className={`bg-white/80 backdrop-blur-xl border ${isSelected ? "border-primary" : "border-white/50"} shadow-sm p-4 rounded-xl flex items-center gap-3 active:scale-95 transition-all cursor-pointer`}
-                >
-                  <div className={`w-10 h-10 ${info.bg} rounded-lg flex items-center justify-center`}>
-                    {info.icon}
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {ingredients.map((item) => {
+                const info = ingredientIcons[item] || { icon: <ChefHat className="w-5 h-5 text-slate-600" />, bg: "bg-gray-50" }
+                const price = suggestions?.prices?.find((p: PriceInfo) => p.ingredient_name.toLowerCase() === item.toLowerCase())?.average_price
+                return (
+                  <div
+                    key={item}
+                    onClick={() => removeIngredient(item)}
+                    className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-sm p-4 rounded-xl flex items-center gap-3 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <div className={`w-10 h-10 ${info.bg} rounded-lg flex items-center justify-center`}>
+                      {info.icon}
+                    </div>
+                    <div className="flex-1">
+                      <span className="font-medium text-sm text-foreground block">{item}</span>
+                      {price != null && (
+                        <span className="text-xs text-muted-foreground">Rp {price.toLocaleString("id-ID")}/kg</span>
+                      )}
+                    </div>
                   </div>
-                  <span className="font-medium text-sm text-foreground">{item}</span>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Quick Ideas */}
         <div className="mb-12">
           <h3 className="font-bold text-lg text-foreground mb-4">Quick Ideas</h3>
           <div className="grid grid-cols-12 gap-4">
             <div
               className="col-span-12 md:col-span-8 h-48 rounded-2xl overflow-hidden relative cursor-pointer group"
-              onClick={() => router.push("/recipe/1")}
+              onClick={() => router.push("/recommendation")}
             >
               <div
                 className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
@@ -150,18 +171,17 @@ export default function FridgeSaverPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
                 <span className="text-white/80 text-xs font-bold uppercase tracking-widest mb-1">Top Match</span>
-                <h4 className="text-white text-xl font-bold">Golden Egg & Spinach Rice</h4>
+                <h4 className="text-white text-xl font-bold">Discover Recipes</h4>
               </div>
             </div>
             <div className="col-span-12 md:col-span-4 h-48 rounded-2xl border-2 border-dashed border-primary/30 bg-white/80 backdrop-blur-xl flex flex-col justify-center items-center text-center p-6">
               <Plus className="w-8 h-8 text-primary mb-2" />
-              <p className="text-sm font-semibold text-muted-foreground">Add 1 more item for 15+ more recipes</p>
+              <p className="text-sm font-semibold text-muted-foreground">Add more ingredients for more recipes</p>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Generate Button */}
       <div className="fixed bottom-24 left-0 right-0 px-6 z-30">
         <button
           onClick={() => router.push("/ai-loading")}

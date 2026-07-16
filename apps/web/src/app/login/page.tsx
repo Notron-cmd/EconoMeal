@@ -1,28 +1,41 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Loader2, Mail, Lock, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/shared/Logo"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login, register } = useAuth()
+  const [mode, setMode] = useState<"login" | "register">("login")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [form, setForm] = useState({ email: "", password: "" })
+  const [form, setForm] = useState({ email: "", password: "", name: "" })
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    try {
+      if (mode === "login") {
+        await login(form.email, form.password)
+      } else {
+        await register(form.email, form.password, form.name || undefined)
+      }
       router.push("/financial-setup")
-    }, 1500)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -46,25 +59,63 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-[28px] font-bold text-on-surface tracking-tight mb-1">
-            Welcome Back
+            {mode === "login" ? "Welcome Back" : "Create Account"}
           </h1>
           <p className="text-[15px] text-on-surface-variant leading-[22px] mb-8 text-center">
-            Sign in to continue your healthy, budget-friendly journey.
+            {mode === "login"
+              ? "Sign in to continue your healthy, budget-friendly journey."
+              : "Start your journey to smarter, budget-friendly meals."}
           </p>
 
+          <div className="w-full mb-6 bg-surface-container-low rounded-xl p-1 flex">
+            <button
+              onClick={() => setMode("login")}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${mode === "login" ? "bg-white shadow-sm text-on-surface" : "text-on-surface-variant"}`}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => setMode("register")}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${mode === "register" ? "bg-white shadow-sm text-on-surface" : "text-on-surface-variant"}`}
+            >
+              Register
+            </button>
+          </div>
+
           <form className="w-full space-y-5" onSubmit={handleSubmit}>
+            {mode === "register" && (
+              <div className="space-y-2">
+                <label className="text-[12px] font-semibold text-on-surface-variant uppercase tracking-[0.05em] px-1">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+                  <input
+                    type="text"
+                    placeholder="John Doe"
+                    value={form.name}
+                    onChange={handleChange("name")}
+                    className="w-full h-[56px] pl-12 pr-5 rounded-xl bg-surface-container-low border-none ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-primary text-[17px] transition-all placeholder:text-outline outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="text-[12px] font-semibold text-on-surface-variant uppercase tracking-[0.05em] px-1">
                 Email Address
               </label>
-              <input
-                type="email"
-                placeholder="hello@student.edu"
-                value={form.email}
-                onChange={handleChange("email")}
-                required
-                className="w-full h-[56px] px-5 rounded-xl bg-surface-container-low border-none ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-primary text-[17px] transition-all placeholder:text-outline outline-none"
-              />
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+                <input
+                  type="email"
+                  placeholder="hello@student.edu"
+                  value={form.email}
+                  onChange={handleChange("email")}
+                  required
+                  className="w-full h-[56px] pl-12 pr-5 rounded-xl bg-surface-container-low border-none ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-primary text-[17px] transition-all placeholder:text-outline outline-none"
+                />
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -72,13 +123,15 @@ export default function LoginPage() {
                 Password
               </label>
               <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={mode === "register" ? "Min. 6 characters" : "Enter your password"}
                   value={form.password}
                   onChange={handleChange("password")}
                   required
-                  className="w-full h-[56px] px-5 pr-14 rounded-xl bg-surface-container-low border-none ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-primary text-[17px] transition-all placeholder:text-outline outline-none"
+                  minLength={mode === "register" ? 6 : undefined}
+                  className="w-full h-[56px] pl-12 pr-14 rounded-xl bg-surface-container-low border-none ring-1 ring-inset ring-outline-variant focus:ring-2 focus:ring-primary text-[17px] transition-all placeholder:text-outline outline-none"
                 />
                 <button
                   type="button"
@@ -90,6 +143,9 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {error && (
+              <p className="text-destructive text-[13px] text-center">{error}</p>
+            )}
             <Button
               type="submit"
               size="lg"
@@ -99,20 +155,10 @@ export default function LoginPage() {
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                "Continue"
+                mode === "login" ? "Sign In" : "Create Account"
               )}
             </Button>
           </form>
-
-          <p className="mt-6 text-[15px] text-on-surface-variant">
-            New to EconoMeal?{" "}
-            <button
-              onClick={() => router.push("/onboarding")}
-              className="text-primary font-semibold hover:underline"
-            >
-              Create an account
-            </button>
-          </p>
         </div>
       </div>
     </div>

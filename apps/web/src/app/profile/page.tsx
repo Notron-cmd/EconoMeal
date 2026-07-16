@@ -1,177 +1,92 @@
 "use client"
 
-import {
-  Bell,
-  Edit2,
-  DollarSign,
-  TrendingUp,
-  Ban,
-  ChefHat,
-  MapPin,
-  Info,
-  LogOut,
-  ChevronRight,
-} from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ArrowLeft, Settings, Mail, MapPin, TrendingUp, Flame, Loader2, LogOut } from "lucide-react"
 import { BottomNav } from "@/components/shared/BottomNav"
+import { useAuth } from "@/hooks/useAuth"
+import { useUserStreak } from "@/hooks/useData"
 
 export default function ProfilePage() {
-  const router = useRouter()
+  const { profile, logout } = useAuth()
+  const { data: streak } = useUserStreak()
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <header className="w-full top-0 sticky z-50 bg-background flex items-center justify-between px-5 py-4">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
-            <img
-              className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj-fAucQ5WCqWGcxsxXaraKNiXYU664FwYldFcProCNQqo3saniet5ryvSDgU1jJdPp-mHkSiOxkpLKkGlTiOb1c69UZ8N72e_B5z8gkPPmdzohVU1kEnbiPUAyNh8hKGzUObWJamKpxCk95aEmepUOxBmk4pY_kaXlXa9WCX_bq94kCU346puTeENPQi50VnhPy31zmZimMrbVvA7UfO3UiDU5JA4FCf7CsTIBvtNiBnh8hbIbnWmaQ"
-              alt=""
-            />
-          </div>
-          <h1 className="text-[28px] font-bold text-primary tracking-tight">EconoMeal</h1>
+    <div className="min-h-screen bg-background text-foreground pb-32">
+      <header className="w-full top-0 sticky bg-background flex items-center justify-between px-5 py-4 z-40">
+        <div className="flex items-center gap-2">
+          <button className="text-muted-foreground hover:opacity-80 transition-opacity active:scale-95" onClick={() => window.history.back()}>
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-[28px] leading-[34px] font-bold tracking-tight text-primary">Profile</h1>
         </div>
-        <button className="text-primary hover:opacity-80 transition-opacity active:scale-95">
-          <Bell className="w-6 h-6" />
+        <button className="text-muted-foreground hover:opacity-80 transition-opacity active:scale-95">
+          <Settings className="w-6 h-6" />
         </button>
       </header>
-      <main className="max-w-md mx-auto px-5 mt-6">
-        <section className="flex flex-col items-center text-center mb-8">
-          <div className="relative mb-4">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-lg">
-              <img
-                className="w-full h-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs4-VJy-OrUe76xD9nRWrAKFyUN8aWYiHCC1mwdIlQjLRpln_wLf6sHy0yjwuUbmME8dLMmLocBRJhjxPdAEPm8AfeGZYZYaxt7eO5RlyYMIW_z_OFyT1D6gZnR7iKDa-738igUCfqmlLO6CuThuU-vxg2p8sA-yEZVarghx-pptIZgneBPuEUiLpe6Av__sOu0TPaPhLY3A11y5ZHCG1h1Dz4yYH5Srm8Hcn3CKafKMZWSrGDlj1iHw"
-                alt=""
-              />
-            </div>
-            <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-1 rounded-full border-2 border-card flex items-center justify-center">
-              <Edit2 className="w-4 h-4" />
-            </div>
+
+      <main className="px-5 max-w-md mx-auto space-y-6 pt-4">
+        <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 flex flex-col items-center gap-4">
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-[#e2ebe0]">
+            <img
+              className="w-full h-full object-cover"
+              src={profile.avatar_url ?? "https://lh3.googleusercontent.com/aida-public/AB6AXuBXyUcV4zjRtYN2lMk_LeFrdQclDw9_JhbFzm9pngdJg6_mu53Ee4OKsY0ZAkAT-sxYF2TlCLG4eUpnCqKtjyDpOFIDSyaHd849AsRJmpfZ7_9tJR9nesTMoCcrWD9NfhY8iN8rgCcJBXOQ8MUd-a14KUW3gtI8FLHIO9j6aC_bbf5HnzM5SupNARkTv4KxhtxoWmCo0p7THd4HD9tFS_n9zvcl39nQNJGsn6iBvnfMMR5rDHslPwFmQg"}
+              alt="Avatar"
+            />
           </div>
-          <h2 className="text-[28px] font-bold text-foreground">Alex Thompson</h2>
-          <p className="text-[15px] text-muted-foreground">Economics Major &bull; $450 Monthly Budget</p>
+          <div className="text-center">
+            <h2 className="text-[22px] leading-[30px] font-bold text-foreground">{profile.full_name ?? "User"}</h2>
+            <p className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-1">
+              <Mail className="w-4 h-4" /> {profile.email}
+            </p>
+            {profile.provinsi && (
+              <p className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-1">
+                <MapPin className="w-4 h-4" /> {profile.provinsi}
+              </p>
+            )}
+          </div>
         </section>
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-card p-4 rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] flex flex-col gap-1">
-            <span className="text-xs font-semibold tracking-[0.05em] text-muted-foreground opacity-70">SAVED THIS MONTH</span>
-            <span className="text-xl font-semibold text-primary">$124.50</span>
+
+        <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 flex items-center justify-around">
+          <div className="text-center">
+            <Flame className="w-6 h-6 text-secondary mx-auto mb-1" />
+            <p className="text-2xl font-bold text-foreground">{streak?.current_streak ?? 0}</p>
+            <p className="text-xs text-muted-foreground">Day Streak</p>
           </div>
-          <div className="bg-card p-4 rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] flex flex-col gap-1">
-            <span className="text-xs font-semibold tracking-[0.05em] text-muted-foreground opacity-70">STREAK</span>
-            <span className="text-xl font-semibold text-secondary">12 Days</span>
+          <div className="text-center">
+            <TrendingUp className="w-6 h-6 text-primary mx-auto mb-1" />
+            <p className="text-2xl font-bold text-foreground">{streak?.longest_streak ?? 0}</p>
+            <p className="text-xs text-muted-foreground">Best Streak</p>
           </div>
-        </div>
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">FINANCIAL SETTINGS</h3>
-            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
-              <button
-                onClick={() => router.push("/financial-setup")}
-                className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-primary">
-                    <DollarSign className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[17px] text-foreground">Income &amp; Budget</p>
-                    <p className="text-xs text-muted-foreground">Manage monthly allowances</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-border" />
-              </button>
-              <div className="h-[1px] bg-border mx-4"></div>
-              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-primary">
-                    <TrendingUp className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[17px] text-foreground">Savings Goals</p>
-                    <p className="text-xs text-muted-foreground">Set and track progress</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-border" />
-              </button>
+        </section>
+
+        {profile.pantry_staples && profile.pantry_staples.length > 0 && (
+          <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-3">Pantry Staples</h3>
+            <div className="flex flex-wrap gap-2">
+              {profile.pantry_staples.map((item: string) => (
+                <span key={item} className="bg-[#e2ebe0] text-primary text-sm font-medium px-3 py-1 rounded-full">
+                  {item}
+                </span>
+              ))}
             </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">PREFERENCES</h3>
-            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
-              <button
-                onClick={() => router.push("/preferences")}
-                className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[#895024]">
-                    <Ban className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[17px] text-foreground">Allergies &amp; Restrictions</p>
-                    <p className="text-xs text-muted-foreground">Nut-free, Gluten-free, Vegan</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-border" />
-              </button>
-              <div className="h-[1px] bg-border mx-4"></div>
-              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-[#895024]">
-                    <ChefHat className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[17px] text-foreground">Kitchen Equipment</p>
-                    <p className="text-xs text-muted-foreground">Air fryer, Microwave, Hot plate</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-border" />
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">REGIONAL</h3>
-            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
-              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[17px] text-foreground">Regional Pricing</p>
-                    <p className="text-xs text-muted-foreground">Boston, MA &bull; US Dollar</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-border" />
-              </button>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-xs font-semibold tracking-[0.05em] text-muted-foreground px-2">SUPPORT</h3>
-            <div className="bg-card rounded-xl shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden">
-              <button className="w-full flex items-center justify-between p-4 transition-all hover:bg-muted active:bg-input active:scale-[0.99]">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                    <Info className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[17px] text-foreground">About EconoMeal</p>
-                    <p className="text-xs text-muted-foreground">Version 2.4.0 (Student Edition)</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-border" />
-              </button>
-            </div>
-          </div>
-          <button className="w-full h-14 bg-destructive/10 text-destructive font-semibold rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-transform mt-6 mb-8 shadow-sm">
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
-          <p className="text-center text-xs font-semibold tracking-[0.05em] text-muted-foreground opacity-40 mb-6">
-            NUTRITION ON A BUDGET &bull; EST. 2024
-          </p>
-        </div>
+          </section>
+        )}
+
+        <button
+          onClick={logout}
+          className="w-full h-12 border border-destructive/30 text-destructive text-base font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-destructive/5 active:scale-[0.98] transition-all"
+        >
+          <LogOut className="w-5 h-5" /> Log Out
+        </button>
       </main>
+
       <BottomNav />
     </div>
   )

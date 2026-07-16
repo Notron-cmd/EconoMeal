@@ -24,21 +24,17 @@ auth.post("/register", async (c) => {
     return c.json({ error: "Email and password are required" }, 400)
   }
 
-  const { data: authData, error: signUpError } = await supabase.auth.signUp({
+  const { data: authData, error: signUpError } = await supabase.auth.admin.createUser({
     email,
     password,
+    email_confirm: true,
+    user_metadata: { name: name || email.split("@")[0] },
   })
 
   if (signUpError) return c.json({ error: signUpError.message }, 400)
   if (!authData.user) return c.json({ error: "Failed to create user" }, 500)
 
-  const { error: confirmError } = await supabase.auth.admin.updateUserById(
-    authData.user.id,
-    { email_confirm: true }
-  )
-  if (confirmError) console.error("Confirm error:", confirmError.message)
-
-  const { error: profileError } = await supabase.from("profiles").insert({
+  const { error: profileError } = await supabase.from("profiles").upsert({
     id: authData.user.id,
     name: name || email.split("@")[0],
   })

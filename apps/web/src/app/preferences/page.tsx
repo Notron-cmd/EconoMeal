@@ -3,9 +3,10 @@
 import { useState } from "react"
 import {
   ArrowLeft, MapPin, ChefHat, Microwave,
-  Utensils, Zap, Search, X, Check, ArrowRight,
+  Utensils, Zap, Search, X, Check, ArrowRight, Loader2,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { api } from "@/lib/api"
 
 const equipmentOptions = [
   { label: "Stove", icon: ChefHat },
@@ -26,6 +27,7 @@ export default function PreferencesPage() {
   const [equipment, setEquipment] = useState<string[]>(["Microwave"])
   const [allergies, setAllergies] = useState<string[]>(["Nut-Free"])
   const [pantry, setPantry] = useState<string[]>(["Rice", "Beans", "Pasta", "Olive Oil", "Garlic", "Onions"])
+  const [saving, setSaving] = useState(false)
 
   const toggleEquipment = (item: string) => {
     setEquipment((prev) =>
@@ -216,12 +218,32 @@ export default function PreferencesPage() {
 
           <div className="mt-6">
             <button
-              onClick={() => router.push("/dashboard")}
-              disabled={!province.trim() || !city.trim()}
+              onClick={async () => {
+                setSaving(true)
+                try {
+                  await api.put("/api/auth/profile", {
+                    provinsi: province,
+                    kota_domisili: city,
+                    alat_masak: equipment,
+                    alergi: allergies,
+                    pantry_staples: pantry,
+                  })
+                  router.push("/dashboard")
+                } catch {
+                  setSaving(false)
+                }
+              }}
+              disabled={!province.trim() || !city.trim() || saving}
               className="w-full h-[56px] bg-gradient-to-b from-[#4ADE80] to-[#22C55E] text-white text-[17px] font-bold rounded-full shadow-md hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Continue
-              <ArrowRight className="w-5 h-5" />
+              {saving ? (
+                <Loader2 className="w-6 h-6 animate-spin" />
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
             {(!province.trim() || !city.trim()) && (
               <p className="text-center text-[13px] text-error mt-2">
