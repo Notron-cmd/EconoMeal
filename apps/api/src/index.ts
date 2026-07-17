@@ -2,7 +2,6 @@ import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { logger } from "hono/logger"
 import { secureHeaders } from "hono/secure-headers"
-import { serve } from "@hono/node-server"
 import authRoutes from "./routes/auth"
 import financesRoutes from "./routes/finances"
 import fridgeRoutes from "./routes/fridge"
@@ -33,14 +32,5 @@ app.route("/api/prices", pricesRoutes)
 app.route("/api/ai", aiRoutes)
 app.route("/api/nutrition", nutritionRoutes)
 app.route("/api/expenses", expensesRoutes)
-
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
-
-console.log(`API server running on http://localhost:${port}`)
-
-serve({
-  fetch: app.fetch,
-  port,
-})
 
 export default app
