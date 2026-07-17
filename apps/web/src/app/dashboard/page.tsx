@@ -6,14 +6,15 @@ import {
   Bot,
   UtensilsCrossed,
   Refrigerator,
-  ArrowRight,
   Plus,
   X,
   Loader2,
+  Flame,
+  TrendingUp,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
-import { useDailyBudget, useSaverTips, useDailyNutrition, useDailySpending, useLogExpense } from "@/hooks/useData"
+import { useDailyBudget, useDailyNutrition, useDailySpending, useLogExpense, useWeeklySpending, useStreak } from "@/hooks/useData"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -21,9 +22,10 @@ export default function DashboardPage() {
   const [logAmount, setLogAmount] = useState("")
   const logExpense = useLogExpense()
   const { data: daily, isLoading: budgetLoading, isError: budgetErr } = useDailyBudget()
-  const { data: tips, isLoading: tipsLoading } = useSaverTips()
   const { data: nutrition } = useDailyNutrition()
   const { data: spending } = useDailySpending()
+  const { data: weeklyData } = useWeeklySpending()
+  const { data: streakData } = useStreak()
 
   const dailyBudget = daily?.daily_budget ?? 0
   const anggaranMakan = daily?.anggaran_makan ?? 0
@@ -31,8 +33,10 @@ export default function DashboardPage() {
   const sisa = Math.max(0, dailyBudget - totalSpent)
   const pct = dailyBudget > 0 ? Math.min(totalSpent / dailyBudget, 1) * 100 : 0
   const barColor = pct < 70 ? "bg-[#22C55E]" : pct < 100 ? "bg-[#fd933d]" : "bg-destructive"
-  const tip = tips?.[0]
   const nutrisi = nutrition ?? { kalori: 0, protein: 0, karbohidrat: 0, lemak: 0 }
+  const days: { date: string; total_spent: number }[] = weeklyData?.days ?? []
+  const maxSpend = Math.max(...days.map((d: { total_spent: number }) => d.total_spent), 1)
+  const streak = streakData?.streak ?? 0
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-secondary/5 pb-32">
@@ -193,18 +197,76 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] overflow-hidden flex flex-col">
-          <div
-            className="h-32 bg-cover bg-center"
-            style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDoflnyFCln-FY0fWabwJVivE_mKRSC7yE1p1F-rRDnqKuG5ZnyUX3jzkVwJ0Vj1j31-BJuHYPxzTXJLbDM3BMI9k0Xyu45bPCPuFiuB6z8HFOkm8yH3MRlst3dOHKhpibEtotZ29Hn-gU-pbO-VpJmPcbaywST-K6okCJSZNou6yHtV5-uyFft1rdruh927pLvYki8HrclCbOKwb5cyRv3hZ528fMvkkemQV6VnMD2JJ4NPICikX5ETA')" }}
-          ></div>
-          <div className="p-6">
-            <h4 className="text-[20px] leading-[28px] font-semibold text-on-surface">Smart Saver Tip</h4>
-            <p className="text-[15px] leading-[22px] text-on-surface-variant mt-2">{tip?.tip_text ?? "Track your spending to discover saving opportunities."}</p>
-            <button className="mt-4 text-primary text-[20px] leading-[28px] font-semibold flex items-center gap-1">
-              Show me more <ArrowRight className="w-5 h-5" />
-            </button>
+        <section className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5 flex flex-col items-center text-center">
+            <Flame className="w-6 h-6 text-[#fd933d] mb-2" />
+            <p className="text-[28px] font-bold text-foreground">{streak}</p>
+            <p className="text-xs text-on-surface-variant">hari berturut-turut</p>
+            <p className="text-[10px] text-on-surface-variant">dalam budget</p>
           </div>
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5 flex flex-col items-center text-center">
+            <TrendingUp className="w-6 h-6 text-primary mb-2" />
+            <p className="text-[28px] font-bold text-foreground">
+              {pct < 100 ? "✅" : "❌"}
+            </p>
+            <p className="text-xs text-on-surface-variant">Hari ini</p>
+            <p className="text-[10px] text-on-surface-variant">{pct < 100 ? "Masih aman" : "Overspend"}</p>
+          </div>
+        </section>
+
+        <section className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5">
+          <h4 className="text-[15px] font-semibold text-on-surface mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            Pengeluaran 7 Hari
+          </h4>
+
+          {/* Budget threshold line area */}
+          <div className="relative">
+            {/* Budget line reference */}
+            {dailyBudget > 0 && (
+              <div
+                className="absolute left-0 right-0 border-t border-dashed border-[#fd933d]/50 z-10"
+                style={{ bottom: `${Math.min((dailyBudget / maxSpend) * 100, 100)}%` }}
+              >
+                <span className="absolute -top-3 right-0 text-[9px] text-[#fd933d] font-medium">
+                  Budget Rp{(dailyBudget / 1000).toFixed(0)}k
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-end gap-2 h-36 pt-4">
+              {days.map((d) => {
+                const dayLabel = new Date(d.date + "T00:00:00").toLocaleDateString("id-ID", { weekday: "short" })
+                const isToday = d.date === new Date().toISOString().split("T")[0]
+                const pctHeight = (d.total_spent / maxSpend) * 100
+                const over = d.total_spent > dailyBudget && dailyBudget > 0
+                return (
+                  <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5">
+                    <span className={`text-[10px] font-semibold ${over ? "text-destructive" : "text-primary"}`}>
+                      {d.total_spent > 0 ? `Rp${(d.total_spent / 1000).toFixed(0)}k` : (isToday ? "Rp0" : "")}
+                    </span>
+                    <div className="w-full flex-1 flex items-end justify-center">
+                      <div
+                        className={`w-full max-w-[32px] rounded-t-lg transition-all duration-300 ${
+                          over ? "bg-gradient-to-t from-destructive/80 to-destructive" : "bg-gradient-to-t from-primary/60 to-primary"
+                        }`}
+                        style={{ height: `${Math.max(pctHeight, 4)}%` }}
+                      />
+                    </div>
+                    <span className={`text-[10px] ${isToday ? "text-foreground font-semibold" : "text-on-surface-variant"}`}>
+                      {dayLabel}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {dailyBudget > 0 && (
+            <p className="text-[10px] text-on-surface-variant text-center mt-4">
+              Batas budget harian: Rp {dailyBudget.toLocaleString("id-ID")}
+            </p>
+          )}
         </section>
       </main>
 

@@ -106,6 +106,20 @@ export function useDailySpending() {
   })
 }
 
+export function useWeeklySpending() {
+  return useQuery({
+    queryKey: ["weekly-spending"],
+    queryFn: () => api.get<{ days: { date: string; total_spent: number }[] }>("/api/expenses/weekly"),
+  })
+}
+
+export function useStreak() {
+  return useQuery({
+    queryKey: ["streak"],
+    queryFn: () => api.get<{ streak: number; daily_budget: number }>("/api/expenses/streak"),
+  })
+}
+
 export function useLogExpense() {
   const qc = useQueryClient()
   return useMutation({
