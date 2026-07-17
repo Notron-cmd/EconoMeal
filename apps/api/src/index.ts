@@ -34,3 +34,11 @@ app.route("/api/nutrition", nutritionRoutes)
 app.route("/api/expenses", expensesRoutes)
 
 export default app
+
+// Local dev server (Vercel akan ignore ini)
+if (!process.env.VERCEL) {
+  const { serve } = await import("@hono/node-server")
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
+  console.log(`API server running on http://localhost:${port}`)
+  serve({ fetch: app.fetch, port })
+}

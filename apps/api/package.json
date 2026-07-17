@@ -15,7 +15,6 @@
   "type": "module",
   "dependencies": {
     "@hono/node-server": "^2.0.9",
-    "@hono/vercel": "^0.3.0",
     "@hono/zod-validator": "^0.9.0",
     "@supabase/supabase-js": "^2.110.5",
     "hono": "^4.12.30",
