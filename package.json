@@ -16,5 +16,8 @@
   "license": "ISC",
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "hono": "^4.12.30"
   }
 }

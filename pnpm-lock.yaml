@@ -205,7 +205,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      hono:
+        specifier: ^4.12.30
+        version: 4.12.30
 
   apps/api:
     dependencies:
