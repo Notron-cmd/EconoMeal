@@ -33,7 +33,7 @@ async function callAI(prompt: string, apiKey: string): Promise<string> {
     throw new Error(`OpenRouter API error (${res.status}): ${errBody}`)
   }
 
-  const data = await res.json()
+  const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
   return data.choices?.[0]?.message?.content ?? ""
 }
 
@@ -110,7 +110,7 @@ Kembalikan JSON SAJA:
     `${supabaseUrl}/rest/v1/user_finances?user_id=eq.${user.id}&select=uang_bulanan`,
     { headers: { "apikey": serviceKey, "Authorization": `Bearer ${serviceKey}` } }
   )
-  const finRows = finRes.ok ? await finRes.json() : []
+  const finRows = (finRes.ok ? await finRes.json() : []) as { uang_bulanan?: number }[]
   const finance = finRows?.[0]
 
   if (!finance) return c.json({ error: "Budget not set" }, 400)

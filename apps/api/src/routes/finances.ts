@@ -26,7 +26,7 @@ finances.get("/", async (c) => {
 
   if (!res.ok) return c.json({})
 
-  const rows = await res.json()
+  const rows = (await res.json()) as { uang_bulanan?: number }[]
   const data = rows?.[0]
   if (!data) return c.json({})
 
@@ -80,7 +80,7 @@ finances.get("/daily", async (c) => {
 
   if (!res.ok) return c.json({ daily_budget: 0, anggaran_makan: 0 })
 
-  const rows = await res.json()
+  const rows = (await res.json()) as { uang_bulanan?: number }[]
   const data = rows?.[0]
   if (!data) return c.json({ daily_budget: 0, anggaran_makan: 0 })
 

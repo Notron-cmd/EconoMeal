@@ -119,7 +119,7 @@ auth.put("/profile", authMiddleware, async (c) => {
     return c.json({ error: `Failed to save profile` }, 400)
   }
 
-  const [saved] = await res.json()
+  const saved = (await res.json()) as Record<string, unknown>
   return c.json(saved)
 })
 
