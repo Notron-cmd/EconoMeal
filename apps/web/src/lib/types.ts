@@ -92,3 +92,8 @@ export type DailyNutrition = {
   karbohidrat: number
   lemak: number
 }
+
+export type DailySpending = {
+  total_spent: number
+  date: string
+}

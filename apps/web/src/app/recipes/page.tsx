@@ -5,7 +5,8 @@ import { ArrowLeft, Flame, Loader2, Trash2, BookHeart, Wheat, Beef, Droplets } f
 import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
 import RecipeDetailSheet from "@/components/shared/RecipeDetailSheet"
-import { useSavedRecipes } from "@/hooks/useData"
+import ConfirmOverlay from "@/components/shared/ConfirmOverlay"
+import { useSavedRecipes, useDeleteSavedRecipe } from "@/hooks/useData"
 import type { SavedRecipe } from "@/lib/types"
 
 function toObject(v: unknown): Record<string, unknown> | null {
@@ -39,6 +40,8 @@ export default function SavedRecipesPage() {
   const router = useRouter()
   const { data: recipes, isLoading } = useSavedRecipes()
   const [selectedRecipe, setSelectedRecipe] = useState<SavedRecipe | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const deleteRecipe = useDeleteSavedRecipe()
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-32">
@@ -87,8 +90,12 @@ export default function SavedRecipesPage() {
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-[20px] leading-[28px] font-semibold text-foreground flex-1">{recipe.nama}</h2>
                 <button
-                  onClick={(e) => { e.stopPropagation(); /* TODO: delete */ }}
-                  className="text-destructive/60 hover:text-destructive p-1 -mr-1 -mt-1"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setDeleteTarget(recipe.id)
+                  }}
+                  disabled={deleteRecipe.isPending}
+                  className="text-destructive/60 hover:text-destructive p-1 -mr-1 -mt-1 disabled:opacity-30"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -122,6 +129,17 @@ export default function SavedRecipesPage() {
       </main>
 
       <RecipeDetailSheet recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
+
+      <ConfirmOverlay
+        open={deleteTarget !== null}
+        message="Hapus resep ini? Budget akan dikembalikan."
+        onConfirm={() => {
+          if (deleteTarget) deleteRecipe.mutate(deleteTarget)
+          setDeleteTarget(null)
+        }}
+        onCancel={() => setDeleteTarget(null)}
+        loading={deleteRecipe.isPending}
+      />
 
       <BottomNav />
     </div>

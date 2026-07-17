@@ -11,6 +11,7 @@ import streaksRoutes from "./routes/streaks"
 import pricesRoutes from "./routes/prices"
 import aiRoutes from "./routes/ai"
 import nutritionRoutes from "./routes/nutrition"
+import expensesRoutes from "./routes/expenses"
 import type { Variables } from "./lib/types"
 
 const app = new Hono<{ Variables: Variables }>()
@@ -31,6 +32,7 @@ app.route("/api/streaks", streaksRoutes)
 app.route("/api/prices", pricesRoutes)
 app.route("/api/ai", aiRoutes)
 app.route("/api/nutrition", nutritionRoutes)
+app.route("/api/expenses", expensesRoutes)
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
 

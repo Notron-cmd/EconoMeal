@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/api"
-import type { DailyBudget, SaverTip, UserStreak, Recipe, FridgeSuggestion, DailyNutrition, SavedRecipe, AiMenu } from "@/lib/types"
+import type { DailyBudget, SaverTip, UserStreak, Recipe, FridgeSuggestion, DailyNutrition, DailySpending, SavedRecipe, AiMenu } from "@/lib/types"
 
 export function useDailyBudget() {
   return useQuery({
@@ -95,6 +95,35 @@ export function useSaveNutrition() {
       api.post("/api/nutrition/save", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["daily-nutrition"] })
+    },
+  })
+}
+
+export function useDailySpending() {
+  return useQuery({
+    queryKey: ["daily-spending"],
+    queryFn: () => api.get<DailySpending>("/api/expenses/today"),
+  })
+}
+
+export function useLogExpense() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (amount: number) =>
+      api.post("/api/expenses/log", { amount }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["daily-spending"] })
+    },
+  })
+}
+
+export function useDeleteSavedRecipe() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/api/recipes/saved/${id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["saved-recipes"] })
+      qc.invalidateQueries({ queryKey: ["daily-spending"] })
     },
   })
 }

@@ -117,6 +117,16 @@ Kembalikan JSON SAJA:
 
   const dailyBudget = Math.floor(Number(finance.uang_bulanan) / 30 / 1000) * 1000
 
+  const today = new Date().toISOString().split("T")[0]
+  const { data: spendData } = await supabase
+    .from("daily_spending")
+    .select("total_spent")
+    .eq("user_id", user.id)
+    .eq("date", today)
+    .maybeSingle()
+  const spentToday = Number(spendData?.total_spent ?? 0)
+  const sisaBudget = Math.max(0, dailyBudget - spentToday)
+
   const bahanKulkas = profile?.pantry_staples?.length
     ? `\nBahan yang tersedia di kulkas: ${profile.pantry_staples.join(", ")}.`
     : ""
@@ -134,9 +144,20 @@ Kembalikan JSON SAJA:
   const categories = ["lauk_ayam", "lauk_ikan", "lauk_tahu_tempe", "sayur", "sambal_goreng", "oseng", "kuah_bening", "kuah_santan", "gorengan", "pepes_pindang", "urap_karedok"]
   const shuffled = categories.sort(() => Math.random() - 0.5).slice(0, 5)
 
+  // Dynamic price range based on remaining budget
+  const ratio = sisaBudget / dailyBudget
+  let minPct: number, maxPct: number
+  if (ratio >= 0.7) {
+    minPct = 0.3; maxPct = 0.6
+  } else if (ratio >= 0.4) {
+    minPct = 0.2; maxPct = 0.5
+  } else {
+    minPct = 0.15; maxPct = 0.4
+  }
+
   const prompt = `Kamu adalah koki rumahan Indonesia. Buat 5 resep asli Indonesia.
 
-Budget harian: Rp ${dailyBudget.toLocaleString("id-ID")}.${bahanKulkas}${preferensiStr}${hargaStr}
+Budget harian: Rp ${dailyBudget.toLocaleString("id-ID")}. Sisa budget hari ini: Rp ${sisaBudget.toLocaleString("id-ID")} (sudah terpakai Rp ${spentToday.toLocaleString("id-ID")}).${bahanKulkas}${preferensiStr}${hargaStr}
 
 Randomizer: ${randomizer}
 Kategori yang WAJIB dipenuhi (1 resep per kategori):
@@ -148,7 +169,7 @@ JANGAN buat hidangan non-Indonesia.
 SETIAP RESEP HARUS BERBEDA dari yang lain (jangan ada bahan utama yang sama antar resep).
 HANYA gunakan alat masak yang tersedia di daftar di atas. Jangan rekomendasikan alat yang tidak tersedia.
 
-Estimasi harga per porsi: Rp ${Math.round(dailyBudget * 0.3).toLocaleString("id-ID")} - Rp ${Math.round(dailyBudget * 0.6).toLocaleString("id-ID")}, hitung dari data harga bahan.
+Estimasi harga per porsi: Rp ${Math.round(sisaBudget * minPct).toLocaleString("id-ID")} - Rp ${Math.round(sisaBudget * maxPct).toLocaleString("id-ID")}, hitung dari data harga bahan. Prioritaskan resep yang totalnya tidak melebihi sisa budget hari ini.
 Untuk setiap bahan_utama, tentukan berat (gram) dan estimasi_harga berdasarkan data harga regional di atas.
 estimasi_harga setiap menu adalah TOTAL dari estimasi_harga semua bahan_utama-nya.
 
@@ -160,14 +181,15 @@ Nutrisi sesuai jenis menu (realistis untuk 1 porsi).
 Kembalikan JSON SAJA:
 {
   "budget_harian": ${dailyBudget},
-  "range_harga": "Rp ${Math.round(dailyBudget * 0.3).toLocaleString("id-ID")} - Rp ${Math.round(dailyBudget * 0.6).toLocaleString("id-ID")}",
+  "sisa_hari_ini": ${sisaBudget},
+  "range_harga": "Rp ${Math.round(sisaBudget * minPct).toLocaleString("id-ID")} - Rp ${Math.round(sisaBudget * maxPct).toLocaleString("id-ID")}",
   "menu": [
     {
       "nama": "Nama Masakan",
-      "estimasi_harga": 15000,
+      "estimasi_harga": 1000,
       "nutrisi": { "kalori": 300, "protein": 15, "lemak": 10, "karbohidrat": 40 },
       "bahan_utama": [
-        { "nama": "Ayam", "berat": 100, "satuan": "gram", "estimasi_harga": 7000 },
+        { "nama": "Ayam", "berat": 100, "satuan": "gram", "estimasi_harga": 3000 },
         { "nama": "Bawang Merah", "berat": 20, "satuan": "gram", "estimasi_harga": 500 }
       ],
       "alat": ["wajan", "pisau", "kompor"],

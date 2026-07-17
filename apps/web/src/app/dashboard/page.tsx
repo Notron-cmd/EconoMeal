@@ -1,24 +1,36 @@
 "use client"
 
+import { useState } from "react"
 import {
   Bell,
   Bot,
   UtensilsCrossed,
   Refrigerator,
   ArrowRight,
+  Plus,
+  X,
+  Loader2,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
-import { useDailyBudget, useSaverTips, useDailyNutrition } from "@/hooks/useData"
+import { useDailyBudget, useSaverTips, useDailyNutrition, useDailySpending, useLogExpense } from "@/hooks/useData"
 
 export default function DashboardPage() {
   const router = useRouter()
+  const [showLogModal, setShowLogModal] = useState(false)
+  const [logAmount, setLogAmount] = useState("")
+  const logExpense = useLogExpense()
   const { data: daily, isLoading: budgetLoading, isError: budgetErr } = useDailyBudget()
   const { data: tips, isLoading: tipsLoading } = useSaverTips()
   const { data: nutrition } = useDailyNutrition()
+  const { data: spending } = useDailySpending()
 
   const dailyBudget = daily?.daily_budget ?? 0
   const anggaranMakan = daily?.anggaran_makan ?? 0
+  const totalSpent = spending?.total_spent ?? 0
+  const sisa = Math.max(0, dailyBudget - totalSpent)
+  const pct = dailyBudget > 0 ? Math.min(totalSpent / dailyBudget, 1) * 100 : 0
+  const barColor = pct < 70 ? "bg-[#22C55E]" : pct < 100 ? "bg-[#fd933d]" : "bg-destructive"
   const tip = tips?.[0]
   const nutrisi = nutrition ?? { kalori: 0, protein: 0, karbohidrat: 0, lemak: 0 }
 
@@ -66,6 +78,31 @@ export default function DashboardPage() {
               <p className="text-center text-sm text-on-surface-variant mt-2">
                 Dari Rp {anggaranMakan.toLocaleString("id-ID")} / bulan
               </p>
+              <div className="mt-5 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-on-surface-variant">Terpakai</span>
+                  <span className="font-semibold">Rp {totalSpent.toLocaleString("id-ID")}</span>
+                </div>
+                <div className="h-3 bg-surface-container-high rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-on-surface-variant">Sisa</span>
+                  <span className={`font-semibold ${sisa === 0 ? "text-destructive" : "text-primary"}`}>
+                    Rp {sisa.toLocaleString("id-ID")}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowLogModal(true)}
+                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-primary/30 text-primary font-semibold text-sm hover:bg-primary/5 active:scale-[0.98] transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                Catat Pengeluaran
+              </button>
             </>
           )}
         </section>
@@ -170,6 +207,42 @@ export default function DashboardPage() {
           </div>
         </section>
       </main>
+
+      {showLogModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowLogModal(false)} />
+          <div className="relative w-full max-w-sm bg-background rounded-2xl p-6 shadow-xl animate-slide-up">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">Catat Pengeluaran</h3>
+              <button onClick={() => setShowLogModal(false)} className="p-1 rounded-full hover:bg-surface-container-low active:scale-90 transition-all">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="Rp 0"
+              value={logAmount}
+              onChange={(e) => setLogAmount(e.target.value)}
+              className="w-full text-center text-3xl font-bold py-4 rounded-xl bg-surface-container-low border-none outline-none focus:ring-2 focus:ring-primary"
+            />
+            <p className="text-xs text-on-surface-variant text-center mt-2">Masukkan nominal pengeluaran hari ini</p>
+            <button
+              onClick={async () => {
+                const amount = Number(logAmount)
+                if (amount <= 0) return
+                await logExpense.mutateAsync(amount)
+                setLogAmount("")
+                setShowLogModal(false)
+              }}
+              disabled={logExpense.isPending || !logAmount || Number(logAmount) <= 0}
+              className="mt-5 w-full bg-primary text-white rounded-xl py-3.5 font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              {logExpense.isPending ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Simpan"}
+            </button>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>

@@ -138,6 +138,70 @@ recipes.get("/saved/:id", async (c) => {
   return c.json(data)
 })
 
+recipes.delete("/saved/:id", async (c) => {
+  const user = c.get("user")
+  const id = c.req.param("id")
+
+  const { data: recipe, error: fetchErr } = await supabase
+    .from("user_saved_recipes")
+    .select("estimasi_harga")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single()
+
+  if (fetchErr || !recipe) return c.json({ error: "Saved recipe not found" }, 404)
+
+  const { error: delErr } = await supabase
+    .from("user_saved_recipes")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id)
+
+  if (delErr) {
+    console.error("Delete recipe error:", delErr)
+    return c.json({ error: "Gagal menghapus resep" }, 400)
+  }
+
+  // Refund: subtract estimasi_harga from today's daily_spending
+  const today = new Date().toISOString().split("T")[0]
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+  const { data: spendData } = await supabase
+    .from("daily_spending")
+    .select("total_spent")
+    .eq("user_id", user.id)
+    .eq("date", today)
+    .maybeSingle()
+
+  const currentTotal = Number(spendData?.total_spent ?? 0)
+  const refunded = Math.min(currentTotal, Number(recipe.estimasi_harga))
+  const newTotal = Math.max(0, currentTotal - refunded)
+
+  await fetch(`${supabaseUrl}/rest/v1/daily_spending?user_id=eq.${user.id}&date=eq.${today}`, {
+    method: "DELETE",
+    headers: { "apikey": serviceKey, "Authorization": `Bearer ${serviceKey}` },
+  })
+
+  if (newTotal > 0) {
+    await fetch(`${supabaseUrl}/rest/v1/daily_spending`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": serviceKey,
+        "Authorization": `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({
+        user_id: user.id,
+        date: today,
+        total_spent: newTotal,
+      }),
+    })
+  }
+
+  return c.json({ ok: true })
+})
+
 // ====== Public recipes ======
 
 recipes.get("/", async (c) => {

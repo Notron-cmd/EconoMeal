@@ -49,9 +49,11 @@ export default function AiLoadingPage() {
     setSaving(true)
     setSaveErr("")
     try {
+      const totalBiaya = selMenus.reduce((s, m) => s + m.estimasi_harga, 0)
       const results = await Promise.allSettled([
         api.post("/api/nutrition/save", totalNutrisi).then(() => qc.invalidateQueries({ queryKey: ["daily-nutrition"] })),
         api.post("/api/recipes/saved", { menu: selMenus }).then(() => qc.invalidateQueries({ queryKey: ["saved-recipes"] })),
+        api.post("/api/expenses/log", { amount: totalBiaya }).then(() => qc.invalidateQueries({ queryKey: ["daily-spending"] })),
       ])
       const errors = results.filter((r) => r.status === "rejected") as PromiseRejectedResult[]
       if (errors.length > 0) {
@@ -145,15 +147,17 @@ export default function AiLoadingPage() {
         <section className="space-y-3">
           {result.menu.map((menu, i) => {
             const isSel = selected.includes(menu.nama)
-            const disabled = selected.length >= 2 && !isSel
+            const locked = selected.length >= 2 && !isSel
             return (
               <button
                 key={i}
-                onClick={() => !disabled && toggle(menu.nama)}
-                disabled={disabled}
+                onClick={() => {
+                  if (locked) return
+                  toggle(menu.nama)
+                }}
                 className={`w-full text-left bg-white rounded-2xl p-4 border-2 transition-all active:scale-[0.98] ${
                   isSel ? "border-primary shadow-[0_0_0_1px_#006d36] shadow-lg" : "border-transparent shadow-sm"
-                } ${disabled ? "opacity-40" : ""}`}
+                } ${locked ? "opacity-40" : ""}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -170,6 +174,10 @@ export default function AiLoadingPage() {
                       <span className="flex items-center gap-1"><Wheat className="w-3 h-3 shrink-0" />{menu.nutrisi.karbohidrat}g K</span>
                       <span className="flex items-center gap-1"><Droplets className="w-3 h-3 shrink-0" />{menu.nutrisi.lemak}g L</span>
                     </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold text-primary">Rp {menu.estimasi_harga.toLocaleString("id-ID")}</p>
+                    <p className="text-[10px] text-on-surface-variant">estimasi</p>
                   </div>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1">
@@ -190,6 +198,12 @@ export default function AiLoadingPage() {
               <Sparkles className="w-5 h-5 text-primary" />
               Ringkasan Nutrisi {selected.length} Menu
             </h3>
+            <div className="flex items-center justify-between bg-surface-container-low rounded-xl px-4 py-3">
+              <span className="text-sm text-on-surface-variant">Total Estimasi</span>
+              <span className="text-base font-bold text-primary">
+                Rp {selMenus.reduce((s, m) => s + m.estimasi_harga, 0).toLocaleString("id-ID")}
+              </span>
+            </div>
             <div className="grid grid-cols-4 gap-2">
               <div className="bg-surface-container-low rounded-xl p-3 text-center">
                 <Flame className="w-4 h-4 text-primary mx-auto mb-1" />
