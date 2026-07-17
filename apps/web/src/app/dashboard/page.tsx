@@ -4,26 +4,23 @@ import {
   Bell,
   Bot,
   UtensilsCrossed,
-  Receipt,
   Refrigerator,
   ArrowRight,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
-import { useDailyBudget, useMonthlyBudget, useSaverTips } from "@/hooks/useData"
+import { useDailyBudget, useSaverTips, useDailyNutrition } from "@/hooks/useData"
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { data: daily } = useDailyBudget()
-  const { data: monthly } = useMonthlyBudget()
-  const { data: tips } = useSaverTips()
+  const { data: daily, isLoading: budgetLoading, isError: budgetErr } = useDailyBudget()
+  const { data: tips, isLoading: tipsLoading } = useSaverTips()
+  const { data: nutrition } = useDailyNutrition()
 
   const dailyBudget = daily?.daily_budget ?? 0
-  const dailyRemaining = daily?.remaining ?? 0
-  const dailyPercentage = daily?.percentage ?? 0
-  const savingProgress = monthly?.percentage ?? 0
-  const savingsAmount = monthly ? (monthly.total_spent > 0 ? monthly.monthly_budget - monthly.total_spent : monthly.monthly_budget) : 0
+  const anggaranMakan = daily?.anggaran_makan ?? 0
   const tip = tips?.[0]
+  const nutrisi = nutrition ?? { kalori: 0, protein: 0, karbohidrat: 0, lemak: 0 }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/10 via-background to-secondary/5 pb-32">
@@ -40,7 +37,9 @@ export default function DashboardPage() {
               alt="User avatar"
             />
           </div>
-          <h1 className="text-[28px] leading-[34px] tracking-tight font-bold text-primary">EconoMeal</h1>
+          <h1 className="text-[28px] leading-[34px] tracking-tight font-bold">
+            <span className="text-[#fd933d]">Econo</span><span className="text-primary">Meal</span>
+          </h1>
         </div>
         <button className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
           <Bell className="w-6 h-6" />
@@ -48,33 +47,27 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-5 space-y-6 pt-2">
-        <section className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 space-y-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1">TODAY&apos;S FOOD BUDGET</p>
-              <h2 className="text-[40px] leading-[48px] tracking-tight font-bold text-primary">
+        <section className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6">
+          <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1 text-center uppercase">
+            Budget Makan Harian
+          </p>
+          {budgetLoading ? (
+            <div className="flex flex-col items-center gap-2 py-2">
+              <div className="h-[48px] w-48 bg-surface-container-high rounded-lg animate-pulse" />
+              <div className="h-4 w-32 bg-surface-container-high rounded animate-pulse" />
+            </div>
+          ) : budgetErr ? (
+            <p className="text-destructive text-center text-sm py-4">Gagal memuat budget. <button onClick={() => location.reload()} className="underline">Muat ulang</button></p>
+          ) : (
+            <>
+              <h2 className="text-[48px] leading-[56px] tracking-tight font-bold text-primary text-center">
                 Rp {dailyBudget.toLocaleString("id-ID")}
               </h2>
-            </div>
-            <div className="text-right">
-              <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mb-1">REMAINING</p>
-              <h2 className="text-[32px] leading-[40px] tracking-tight font-bold text-primary">
-                Rp {dailyRemaining.toLocaleString("id-ID")}
-              </h2>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[15px] leading-[22px] text-on-surface-variant italic">You&apos;re in control.</span>
-              <span className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-primary">SAVINGS PROGRESS</span>
-            </div>
-            <div className="bg-[#f4f4f5] rounded-full h-[18px] overflow-hidden">
-              <div className="h-full bg-gradient-to-b from-[#4ADE80] to-[#22C55E] rounded-full" style={{ width: `${Math.min(savingProgress, 100)}%` }}></div>
-            </div>
-            <p className="text-center text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant mt-1">
-              {monthly ? `Spent Rp ${monthly.total_spent.toLocaleString("id-ID")} of Rp ${monthly.monthly_budget.toLocaleString("id-ID")}` : ""}
-            </p>
-          </div>
+              <p className="text-center text-sm text-on-surface-variant mt-2">
+                Dari Rp {anggaranMakan.toLocaleString("id-ID")} / bulan
+              </p>
+            </>
+          )}
         </section>
 
         <section className="relative py-4">
@@ -83,8 +76,8 @@ export default function DashboardPage() {
             className="w-full bg-gradient-to-b from-[#4ADE80] to-[#22C55E] shadow-[0_0_20px_rgba(74,222,128,0.3)] p-6 rounded-[1rem] flex items-center justify-between text-white active:scale-95 transition-transform"
           >
             <div className="text-left">
-              <h3 className="text-[20px] leading-[28px] font-semibold leading-tight">Ask AI for Recommendation</h3>
-              <p className="text-white/80 text-[15px] leading-[22px] mt-1">&ldquo;What can I cook with the eggs and spinach in my fridge?&rdquo;</p>
+              <h3 className="text-[20px] leading-[28px] font-semibold leading-tight">Rekomendasi AI</h3>
+              <p className="text-white/80 text-[15px] leading-[22px] mt-1">&ldquo;Apa yang bisa aku masak dengan budget Rp {dailyBudget.toLocaleString("id-ID")} hari ini?&rdquo;</p>
             </div>
             <div className="bg-white/20 p-4 rounded-full">
               <Bot className="w-8 h-8" />
@@ -94,26 +87,48 @@ export default function DashboardPage() {
 
         <section className="grid grid-cols-2 gap-4">
           <div className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
-            <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant uppercase">Calories</p>
-            <div className="relative w-16 h-16 flex items-center justify-center">
+            <p className="text-xs tracking-[0.05em] font-bold text-on-surface-variant uppercase">Kalori</p>
+            <div className="relative w-20 h-20 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" fill="transparent" r="28" stroke="#f4f4f5" strokeWidth="6" />
-                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#006d36" strokeDasharray="175" strokeDashoffset="45" strokeWidth="6" />
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#006d36" strokeDasharray="175" strokeDashoffset={175 - Math.min(nutrisi.kalori / 2150, 1) * 175} strokeWidth="6" />
               </svg>
-              <span className="absolute text-[20px] leading-[28px] font-semibold">1.2k</span>
+              <span className="absolute text-sm font-bold">{nutrisi.kalori > 0 ? nutrisi.kalori.toLocaleString("id-ID") : "—"}</span>
             </div>
-            <p className="text-[15px] leading-[22px] text-on-surface-variant">60% of goal</p>
+              <p className="text-xs text-on-surface-variant">{nutrisi.kalori > 0 ? `${Math.round(nutrisi.kalori / 2150 * 100)}%` : "—"}</p>
           </div>
-          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
-            <p className="text-[12px] leading-[16px] tracking-[0.05em] font-semibold text-on-surface-variant uppercase">Protein</p>
-            <div className="relative w-16 h-16 flex items-center justify-center">
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
+            <p className="text-xs tracking-[0.05em] font-bold text-on-surface-variant uppercase">Protein</p>
+            <div className="relative w-20 h-20 flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" fill="transparent" r="28" stroke="#f4f4f5" strokeWidth="6" />
-                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#fd933d" strokeDasharray="175" strokeDashoffset="100" strokeWidth="6" />
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#fd933d" strokeDasharray="175" strokeDashoffset={175 - Math.min(nutrisi.protein / 65, 1) * 175} strokeWidth="6" />
               </svg>
-              <span className="absolute text-[20px] leading-[28px] font-semibold">45g</span>
+              <span className="absolute text-sm font-bold">{nutrisi.protein > 0 ? `${nutrisi.protein}g` : "—"}</span>
             </div>
-            <p className="text-[15px] leading-[22px] text-on-surface-variant">Target: 80g</p>
+            <p className="text-xs text-on-surface-variant">{nutrisi.protein > 0 ? "Target 65g" : "—"}</p>
+          </div>
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
+            <p className="text-xs tracking-[0.05em] font-bold text-on-surface-variant uppercase">Karbo</p>
+            <div className="relative w-20 h-20 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#f4f4f5" strokeWidth="6" />
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#fd933d" strokeDasharray="175" strokeDashoffset={175 - Math.min(nutrisi.karbohidrat / 300, 1) * 175} strokeWidth="6" />
+              </svg>
+              <span className="absolute text-sm font-bold">{nutrisi.karbohidrat > 0 ? `${nutrisi.karbohidrat}g` : "—"}</span>
+            </div>
+            <p className="text-xs text-on-surface-variant">{nutrisi.karbohidrat > 0 ? "Target 300g" : "—"}</p>
+          </div>
+          <div className="bg-white rounded-[24px] shadow-[0px_10px_30px rgba(28,25,23,0.04)] p-4 flex flex-col items-center justify-center text-center space-y-2">
+            <p className="text-xs tracking-[0.05em] font-bold text-on-surface-variant uppercase">Lemak</p>
+            <div className="relative w-20 h-20 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#f4f4f5" strokeWidth="6" />
+                <circle cx="32" cy="32" fill="transparent" r="28" stroke="#3b82f6" strokeDasharray="175" strokeDashoffset={175 - Math.min(nutrisi.lemak / 65, 1) * 175} strokeWidth="6" />
+              </svg>
+              <span className="absolute text-sm font-bold">{nutrisi.lemak > 0 ? `${nutrisi.lemak}g` : "—"}</span>
+            </div>
+            <p className="text-xs text-on-surface-variant">{nutrisi.lemak > 0 ? "Target 65g" : "—"}</p>
           </div>
         </section>
 
@@ -136,16 +151,7 @@ export default function DashboardPage() {
               <div className="bg-[#fd933d]/20 p-2 rounded-lg text-secondary">
                 <UtensilsCrossed className="w-6 h-6" />
               </div>
-              <p className="text-[17px] leading-[24px] font-semibold text-on-surface">View Recipes</p>
-            </button>
-            <button
-              onClick={() => router.push("/expense-log")}
-              className="min-w-[140px] bg-white rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-4 flex flex-col items-start gap-4 active:scale-95 transition-transform cursor-pointer shrink-0"
-            >
-              <div className="bg-[#dde5da] p-2 rounded-lg text-on-surface-variant">
-                <Receipt className="w-6 h-6" />
-              </div>
-              <p className="text-[17px] leading-[24px] font-semibold text-on-surface">Expense Log</p>
+              <p className="text-[17px] leading-[24px] font-semibold text-on-surface">Resep</p>
             </button>
           </div>
         </section>

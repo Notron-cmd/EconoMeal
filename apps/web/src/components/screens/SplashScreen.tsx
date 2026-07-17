@@ -18,15 +18,15 @@ export default function SplashScreen() {
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 py-8 text-center">
         <div className="mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
           <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
-            <div className="absolute inset-0 bg-primary/5 rounded-full scale-110 animate-pulse" />
-            <div className="absolute inset-0 bg-primary/10 rounded-full scale-125 opacity-30 animate-pulse" style={{ animationDelay: "1s" }} />
+            <div className="absolute inset-0 bg-primary/5 rounded-full scale-100 animate-pulse" />
+            <div className="absolute inset-0 bg-primary/10 rounded-full scale-115 opacity-30 animate-pulse" style={{ animationDelay: "1s" }} />
             <Logo className="w-full h-full object-contain relative z-10 drop-shadow-2xl" />
           </div>
         </div>
 
         <div className="mb-8 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-          <h1 className="text-[28px] leading-[34px] md:text-[32px] md:leading-[40px] font-bold text-primary tracking-tight mb-1">
-            EconoMeal
+          <h1 className="text-[32px] md:text-[38px] font-bold tracking-tight mb-1">
+            <span className="text-[#fd933d]">Econo</span><span className="text-primary">Meal</span>
           </h1>
           <p className="text-[20px] leading-[28px] font-medium text-on-surface-variant opacity-90">
             Eat Smart. Save More.
@@ -60,9 +60,6 @@ export default function SplashScreen() {
             Get Started
             <ArrowRight className="w-5 h-5" />
           </Button>
-          <p className="text-[12px] leading-[16px] font-semibold text-on-surface-variant uppercase tracking-widest opacity-60">
-            Join 5,000+ students today
-          </p>
         </div>
       </main>
     </div>

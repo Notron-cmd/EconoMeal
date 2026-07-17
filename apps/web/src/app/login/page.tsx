@@ -31,8 +31,8 @@ export default function LoginPage() {
       } else {
         await register(form.email, form.password, form.name || undefined)
       }
-      const finance = await api.get<{ id?: string }>("/api/finances")
-      if (finance?.id) {
+      const finance = await api.get<{ anggaran_makan?: number }>("/api/finances")
+      if (finance?.anggaran_makan) {
         router.push("/dashboard")
       } else {
         router.push("/financial-setup")
@@ -60,8 +60,8 @@ export default function LoginPage() {
         </button>
 
         <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full">
-          <div className="w-20 h-20 rounded-2xl bg-surface-container-highest flex items-center justify-center mb-6">
-            <Logo className="w-12 h-12" />
+          <div className="w-28 h-28 rounded-2xl bg-surface-container-highest flex items-center justify-center mb-6">
+            <Logo className="w-20 h-20" />
           </div>
 
           <h1 className="text-[28px] font-bold text-on-surface tracking-tight mb-1">

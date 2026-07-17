@@ -64,8 +64,8 @@ export default function OnboardingPage() {
         <header
           className={`flex items-center ${isLast ? "justify-center" : "justify-between"} mb-4`}
         >
-          <span className="text-[28px] font-bold text-primary tracking-tight leading-[34px]">
-            EconoMeal
+          <span className="text-[28px] font-bold tracking-tight">
+            <span className="text-[#fd933d]">Econo</span><span className="text-primary">Meal</span>
           </span>
           {!isLast && (
             <button

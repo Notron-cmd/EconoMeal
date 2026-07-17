@@ -2,30 +2,12 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/api"
-import type {
-  DailyBudget, MonthlyBudget, WeeklyBudget,
-  SaverTip, UserStreak, Recipe,
-  Expense, FridgeSuggestion,
-} from "@/lib/types"
+import type { DailyBudget, SaverTip, UserStreak, Recipe, FridgeSuggestion, DailyNutrition, SavedRecipe, AiMenu } from "@/lib/types"
 
 export function useDailyBudget() {
   return useQuery({
     queryKey: ["daily-budget"],
     queryFn: () => api.get<DailyBudget>("/api/finances/daily"),
-  })
-}
-
-export function useMonthlyBudget() {
-  return useQuery({
-    queryKey: ["monthly-budget"],
-    queryFn: () => api.get<MonthlyBudget>("/api/budget/monthly"),
-  })
-}
-
-export function useWeeklyBudget() {
-  return useQuery({
-    queryKey: ["weekly-budget"],
-    queryFn: () => api.get<WeeklyBudget>("/api/budget/weekly"),
   })
 }
 
@@ -58,37 +40,11 @@ export function useRecipe(id: string) {
   })
 }
 
-export function useExpenses() {
+export function useIngredients(provinsi?: string) {
   return useQuery({
-    queryKey: ["expenses"],
-    queryFn: () => api.get<Expense[]>("/api/expenses"),
-  })
-}
-
-export function useCreateExpense() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (body: { amount: number; name?: string; meal_type: string; note?: string }) =>
-      api.post("/api/expenses", body),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["expenses"] })
-      qc.invalidateQueries({ queryKey: ["daily-budget"] })
-      qc.invalidateQueries({ queryKey: ["weekly-budget"] })
-      qc.invalidateQueries({ queryKey: ["monthly-budget"] })
-    },
-  })
-}
-
-export function useDeleteExpense() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (id: string) => api.delete(`/api/expenses/${id}`),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["expenses"] })
-      qc.invalidateQueries({ queryKey: ["daily-budget"] })
-      qc.invalidateQueries({ queryKey: ["weekly-budget"] })
-      qc.invalidateQueries({ queryKey: ["monthly-budget"] })
-    },
+    queryKey: ["ingredients", provinsi],
+    queryFn: () => api.get<{ id: string; nama_bahan: string; estimasi_harga: number; satuan: string }[]>(`/api/prices/ingredients${provinsi ? `?provinsi=${encodeURIComponent(provinsi)}` : ""}`),
+    enabled: !!provinsi,
   })
 }
 
@@ -96,6 +52,50 @@ export function useFridgeSuggestions() {
   return useQuery({
     queryKey: ["fridge-suggestions"],
     queryFn: () => api.get<FridgeSuggestion>("/api/fridge/suggestions"),
+  })
+}
+
+export function useSavedRecipes() {
+  return useQuery({
+    queryKey: ["saved-recipes"],
+    queryFn: () => api.get<SavedRecipe[]>("/api/recipes/saved"),
+  })
+}
+
+export function useSavedRecipe(id: string) {
+  return useQuery({
+    queryKey: ["saved-recipe", id],
+    queryFn: () => api.get<SavedRecipe>(`/api/recipes/saved/${id}`),
+    enabled: !!id,
+  })
+}
+
+export function useSaveRecipes() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (menu: AiMenu[]) =>
+      api.post("/api/recipes/saved", { menu }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["saved-recipes"] })
+    },
+  })
+}
+
+export function useDailyNutrition() {
+  return useQuery({
+    queryKey: ["daily-nutrition"],
+    queryFn: () => api.get<DailyNutrition>("/api/nutrition/today"),
+  })
+}
+
+export function useSaveNutrition() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: DailyNutrition) =>
+      api.post("/api/nutrition/save", data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["daily-nutrition"] })
+    },
   })
 }
 

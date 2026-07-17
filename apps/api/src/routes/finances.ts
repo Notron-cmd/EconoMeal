@@ -10,74 +10,86 @@ const finances = new Hono<{ Variables: Variables }>()
 finances.use("*", authMiddleware)
 
 const financeSchema = z.object({
-  uang_bulanan: z.number().positive(),
-  target_tabungan: z.number().min(0).optional().default(0),
-  pengeluaran_tetap: z.number().min(0).optional().default(0),
+  anggaran_makan: z.number().positive(),
 })
 
 finances.get("/", async (c) => {
   const user = c.get("user")
 
-  const { data } = await supabase
-    .from("user_finances")
-    .select("*")
-    .eq("user_id", user.id)
-    .single()
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-  return c.json(data ?? {})
+  const res = await fetch(
+    `${supabaseUrl}/rest/v1/user_finances?user_id=eq.${user.id}&select=*`,
+    { headers: { "apikey": serviceKey, "Authorization": `Bearer ${serviceKey}` } }
+  )
+
+  if (!res.ok) return c.json({})
+
+  const rows = await res.json()
+  const data = rows?.[0]
+  if (!data) return c.json({})
+
+  return c.json({
+    anggaran_makan: Number(data.uang_bulanan),
+  })
 })
 
 finances.post("/", zValidator("json", financeSchema), async (c) => {
   const user = c.get("user")
   const body = c.req.valid("json")
 
-  const { data, error } = await supabase
-    .from("user_finances")
-    .upsert({
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+  const res = await fetch(`${supabaseUrl}/rest/v1/user_finances?on_conflict=user_id`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": serviceKey,
+      "Authorization": `Bearer ${serviceKey}`,
+      "Prefer": "resolution=merge-duplicates,return=representation",
+    },
+    body: JSON.stringify({
       user_id: user.id,
-      uang_bulanan: body.uang_bulanan,
-      target_tabungan: body.target_tabungan,
-      pengeluaran_tetap: body.pengeluaran_tetap,
-    })
-    .select()
-    .single()
+      uang_bulanan: body.anggaran_makan,
+    }),
+  })
 
-  if (error) return c.json({ error: error.message }, 400)
+  if (!res.ok) {
+    const errText = await res.text()
+    console.error("Finance save error:", res.status, errText.slice(0, 200))
+    return c.json({ error: `Failed to save (${res.status})` }, 400)
+  }
 
-  const raw = (body.uang_bulanan - body.pengeluaran_tetap - body.target_tabungan) / 30
-  const dailyBudget = Math.floor(raw / 1000) * 1000
+  const dailyBudget = Math.floor(body.anggaran_makan / 30 / 1000) * 1000
 
-  return c.json({ ...data, daily_budget: dailyBudget })
+  return c.json({ anggaran_makan: body.anggaran_makan, daily_budget: dailyBudget })
 })
 
 finances.get("/daily", async (c) => {
   const user = c.get("user")
 
-  const { data } = await supabase
-    .from("user_finances")
-    .select("*")
-    .eq("user_id", user.id)
-    .single()
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-  if (!data) return c.json({ daily_budget: 0 })
+  const res = await fetch(
+    `${supabaseUrl}/rest/v1/user_finances?user_id=eq.${user.id}&select=*`,
+    { headers: { "apikey": serviceKey, "Authorization": `Bearer ${serviceKey}` } }
+  )
 
-  const raw = (data.uang_bulanan - data.pengeluaran_tetap - data.target_tabungan) / 30
-  const daily = Math.floor(raw / 1000) * 1000
+  if (!res.ok) return c.json({ daily_budget: 0, anggaran_makan: 0 })
 
-  const today = new Date().toISOString().split("T")[0]
-  const { data: spentData } = await supabase
-    .from("expense_logs")
-    .select("amount")
-    .eq("user_id", user.id)
-    .gte("logged_at", today)
+  const rows = await res.json()
+  const data = rows?.[0]
+  if (!data) return c.json({ daily_budget: 0, anggaran_makan: 0 })
 
-  const totalSpent = spentData?.reduce((sum, e) => sum + Number(e.amount), 0) ?? 0
+  const anggaran = Number(data.uang_bulanan)
+  const daily = Math.floor(anggaran / 30 / 1000) * 1000
 
   return c.json({
     daily_budget: daily,
-    spent_today: totalSpent,
-    remaining: daily - totalSpent,
-    percentage: daily > 0 ? Math.round((totalSpent / daily) * 100) : 0,
+    anggaran_makan: anggaran,
   })
 })
 

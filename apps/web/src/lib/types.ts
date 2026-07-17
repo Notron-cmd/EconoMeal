@@ -1,12 +1,3 @@
-export type Expense = {
-  id: string
-  amount: number
-  name: string | null
-  meal_type: string
-  note: string | null
-  logged_at: string
-}
-
 export type Recipe = {
   id: string
   name: string
@@ -25,26 +16,7 @@ export type Recipe = {
 
 export type DailyBudget = {
   daily_budget: number
-  spent_today: number
-  remaining: number
-  percentage: number
-}
-
-export type MonthlyBudget = {
-  monthly_budget: number
-  total_spent: number
-  remaining: number
-  percentage: number
-  savings_goal: number
-}
-
-export type WeeklyBudget = {
-  weekly_budget: number
-  total_spent: number
-  remaining: number
-  percentage: number
-  daily_average: number
-  expenses: { amount: number; logged_at: string }[]
+  anggaran_makan: number
 }
 
 export type SaverTip = {
@@ -69,4 +41,54 @@ export type PriceInfo = {
   ingredient_name: string
   average_price: number
   province: string
+}
+
+export type RecipeDetail = {
+  nama: string
+  estimasi_harga: number
+  nutrisi: { kalori: number; protein: number; lemak: number; karbohidrat: number }
+  bahan_utama: BahanDetail[]
+  cara_singkat: string
+  alat?: string[]
+}
+
+export type BahanDetail = {
+  nama: string
+  berat: number
+  satuan: string
+  estimasi_harga: number
+}
+
+export type AiMenu = {
+  nama: string
+  estimasi_harga: number
+  nutrisi: { kalori: number; protein: number; lemak: number; karbohidrat: number }
+  bahan_utama: BahanDetail[]
+  cara_singkat: string
+  alat?: string[]
+}
+
+export type AiRecommendation = {
+  budget_harian: number
+  range_harga: string
+  menu: AiMenu[]
+}
+
+export type SavedRecipe = {
+  id: string
+  user_id: string
+  nama: string
+  estimasi_harga: number
+  nutrisi: { kalori: number; protein: number; lemak: number; karbohidrat: number }
+  bahan_utama: BahanDetail[]
+  cara_singkat: string
+  alat?: string[]
+  created_at: string
+}
+
+export type DailyNutrition = {
+  kalori: number
+  protein: number
+  karbohidrat: number
+  lemak: number
 }

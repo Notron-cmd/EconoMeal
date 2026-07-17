@@ -34,11 +34,21 @@ auth.post("/register", async (c) => {
   if (signUpError) return c.json({ error: signUpError.message }, 400)
   if (!authData.user) return c.json({ error: "Failed to create user" }, 500)
 
-  const { error: profileError } = await supabase.from("profiles").upsert({
-    id: authData.user.id,
-    name: name || email.split("@")[0],
+  // Use raw fetch to bypass RLS
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  await fetch(`${supabaseUrl}/rest/v1/profiles`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": serviceKey,
+      "Authorization": `Bearer ${serviceKey}`,
+    },
+    body: JSON.stringify({
+      id: authData.user.id,
+      name: name || email.split("@")[0],
+    }),
   })
-  if (profileError) console.error("Profile creation error:", profileError.message)
 
   const { data: loginData } = await supabase.auth.signInWithPassword({
     email,
@@ -82,24 +92,35 @@ auth.put("/profile", authMiddleware, async (c) => {
   const user = c.get("user")
   const body = await c.req.json()
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .update({
-      name: body.name,
-      kota_domisili: body.kota_domisili,
-      provinsi: body.provinsi,
-      pantry_staples: body.pantry_staples,
-      alat_masak: body.alat_masak,
-      alergi: body.alergi,
-      avatar_url: body.avatar_url,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id)
-    .select()
-    .single()
+  const profileData: Record<string, unknown> = { id: user.id, updated_at: new Date().toISOString() }
+  for (const key of ["name", "kota_domisili", "provinsi", "pantry_staples", "alat_masak", "alergi", "avatar_url"]) {
+    if (body[key] !== undefined) profileData[key] = body[key]
+  }
 
-  if (error) return c.json({ error: error.message }, 400)
-  return c.json(data)
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+  // Upsert via POST with on_conflict (single request, bypasses RLS)
+  const qs = `on_conflict=id`
+  const res = await fetch(`${supabaseUrl}/rest/v1/profiles?${qs}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": serviceKey,
+      "Authorization": `Bearer ${serviceKey}`,
+      "Prefer": "resolution=merge-duplicates,return=representation",
+    },
+    body: JSON.stringify(profileData),
+  })
+
+  if (!res.ok) {
+    const errText = await res.text()
+    console.error("Profile save error:", res.status, errText.slice(0, 200))
+    return c.json({ error: `Failed to save profile` }, 400)
+  }
+
+  const [saved] = await res.json()
+  return c.json(saved)
 })
 
 export default auth

@@ -28,6 +28,9 @@ async function request<T>(
     body: body ? JSON.stringify(body) : undefined,
   })
 
+  if (res.status === 401) {
+    clearToken()
+  }
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`)
   return data as T

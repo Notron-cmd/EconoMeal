@@ -1,13 +1,28 @@
 "use client"
 
-import { ArrowLeft, Settings, Mail, MapPin, TrendingUp, Flame, Loader2, LogOut } from "lucide-react"
+import { useState, useEffect } from "react"
+import { ArrowLeft, Settings, MapPin, TrendingUp, Flame, Loader2, LogOut, BookHeart, Wallet, Apple, ChefHat, ExternalLink, Mail } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { BottomNav } from "@/components/shared/BottomNav"
 import { useAuth } from "@/hooks/useAuth"
-import { useUserStreak } from "@/hooks/useData"
+import { useUserStreak, useSavedRecipes, useDailyBudget, useDailyNutrition } from "@/hooks/useData"
 
 export default function ProfilePage() {
-  const { profile, logout } = useAuth()
+  const router = useRouter()
+  const { profile, user, logout, refreshProfile } = useAuth()
+
+  useEffect(() => { refreshProfile() }, [])
+
+  const handleLogout = () => {
+    logout()
+    router.push("/login")
+  }
   const { data: streak } = useUserStreak()
+  const { data: savedRecipes } = useSavedRecipes()
+  const { data: budget } = useDailyBudget()
+  const { data: nutrition } = useDailyNutrition()
+
+  const dailyBudget = budget ? Math.floor(Number(budget.anggaran_makan) / 30 / 1000) * 1000 : 0
 
   if (!profile) {
     return (
@@ -31,8 +46,8 @@ export default function ProfilePage() {
         </button>
       </header>
 
-      <main className="px-5 max-w-md mx-auto space-y-6 pt-4">
-        <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 flex flex-col items-center gap-4">
+      <main className="px-5 max-w-md mx-auto space-y-5 pt-4">
+        <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 flex flex-col items-center gap-3">
           <div className="w-24 h-24 rounded-full overflow-hidden bg-[#e2ebe0]">
             <img
               className="w-full h-full object-cover"
@@ -41,12 +56,10 @@ export default function ProfilePage() {
             />
           </div>
           <div className="text-center">
-            <h2 className="text-[22px] leading-[30px] font-bold text-foreground">{profile.full_name ?? "User"}</h2>
-            <p className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-1">
-              <Mail className="w-4 h-4" /> {profile.email}
-            </p>
+            <h2 className="text-[22px] leading-[30px] font-bold text-foreground">{profile.name || profile.full_name || "User"}</h2>
+            <p className="text-sm text-muted-foreground flex items-center justify-center gap-1"><Mail className="w-4 h-4" /> {profile.email || user?.email || ""}</p>
             {profile.provinsi && (
-              <p className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-1">
+              <p className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-0.5">
                 <MapPin className="w-4 h-4" /> {profile.provinsi}
               </p>
             )}
@@ -66,11 +79,69 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {profile.pantry_staples && profile.pantry_staples.length > 0 && (
-          <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-3">Pantry Staples</h3>
+        <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-6 grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <BookHeart className="w-5 h-5 text-primary mx-auto mb-1" />
+            <p className="text-2xl font-bold text-foreground">{savedRecipes?.length ?? 0}</p>
+            <p className="text-xs text-muted-foreground">Resep Tersimpan</p>
+          </div>
+          <div className="text-center">
+            <Wallet className="w-5 h-5 text-secondary mx-auto mb-1" />
+            <p className="text-2xl font-bold text-foreground">{dailyBudget > 0 ? `Rp ${dailyBudget.toLocaleString("id-ID")}` : "—"}</p>
+            <p className="text-xs text-muted-foreground">Budget Harian</p>
+          </div>
+        </section>
+
+        {nutrition && (nutrition.kalori > 0 || nutrition.protein > 0) && (
+          <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Nutrisi Hari Ini</h3>
+            <div className="grid grid-cols-4 gap-2 text-center text-xs">
+              <div>
+                <Flame className="w-4 h-4 text-primary mx-auto mb-0.5" />
+                <p className="font-bold">{nutrition.kalori}</p>
+                <p className="text-muted-foreground">Kalori</p>
+              </div>
+              <div>
+                <span className="block text-secondary font-bold mb-0.5">P</span>
+                <p className="font-bold">{nutrition.protein}g</p>
+                <p className="text-muted-foreground">Protein</p>
+              </div>
+              <div>
+                <span className="block text-[#fd933d] font-bold mb-0.5">K</span>
+                <p className="font-bold">{nutrition.karbohidrat}g</p>
+                <p className="text-muted-foreground">Karbo</p>
+              </div>
+              <div>
+                <span className="block text-blue-500 font-bold mb-0.5">L</span>
+                <p className="font-bold">{nutrition.lemak}g</p>
+                <p className="text-muted-foreground">Lemak</p>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {profile.alat_masak && profile.alat_masak.length > 0 && (
+          <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <ChefHat className="w-4 h-4 text-primary" /> Alat Masak
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {profile.pantry_staples.map((item: string) => (
+              {profile.alat_masak.map((item: string) => (
+                <span key={item} className="bg-surface-container-low text-sm px-3 py-1 rounded-full">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {profile.alergi && profile.alergi.length > 0 && (
+          <section className="bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Apple className="w-4 h-4 text-primary" /> Preferensi Makanan
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {profile.alergi.map((item: string) => (
                 <span key={item} className="bg-[#e2ebe0] text-primary text-sm font-medium px-3 py-1 rounded-full">
                   {item}
                 </span>
@@ -79,8 +150,16 @@ export default function ProfilePage() {
           </section>
         )}
 
+        <a
+          href="/preferences"
+          className="flex items-center justify-between bg-card rounded-[24px] shadow-[0px_10px_30px_rgba(28,25,23,0.04)] p-5 active:scale-[0.98] transition-all"
+        >
+          <span className="font-semibold text-foreground">Edit Preferences</span>
+          <ExternalLink className="w-4 h-4 text-muted-foreground" />
+        </a>
+
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="w-full h-12 border border-destructive/30 text-destructive text-base font-semibold rounded-full flex items-center justify-center gap-2 hover:bg-destructive/5 active:scale-[0.98] transition-all"
         >
           <LogOut className="w-5 h-5" /> Log Out

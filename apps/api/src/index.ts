@@ -5,11 +5,12 @@ import { secureHeaders } from "hono/secure-headers"
 import { serve } from "@hono/node-server"
 import authRoutes from "./routes/auth"
 import financesRoutes from "./routes/finances"
-import expensesRoutes from "./routes/expenses"
 import fridgeRoutes from "./routes/fridge"
-import budgetRoutes from "./routes/budget"
 import recipesRoutes from "./routes/recipes"
 import streaksRoutes from "./routes/streaks"
+import pricesRoutes from "./routes/prices"
+import aiRoutes from "./routes/ai"
+import nutritionRoutes from "./routes/nutrition"
 import type { Variables } from "./lib/types"
 
 const app = new Hono<{ Variables: Variables }>()
@@ -24,11 +25,12 @@ app.get("/health", (c) => {
 
 app.route("/api/auth", authRoutes)
 app.route("/api/finances", financesRoutes)
-app.route("/api/expenses", expensesRoutes)
 app.route("/api/fridge", fridgeRoutes)
-app.route("/api/budget", budgetRoutes)
 app.route("/api/recipes", recipesRoutes)
 app.route("/api/streaks", streaksRoutes)
+app.route("/api/prices", pricesRoutes)
+app.route("/api/ai", aiRoutes)
+app.route("/api/nutrition", nutritionRoutes)
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3001
 

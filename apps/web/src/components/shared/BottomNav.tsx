@@ -1,19 +1,30 @@
 "use client"
 
-import { Home, BookOpen, Bot, Wallet, User } from "lucide-react"
+import { Home, BookOpen, Bot, User } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 
 const navItems = [
   { icon: Home, label: "Home", href: "/dashboard" },
-  { icon: BookOpen, label: "Recipes", href: "/recommendation" },
+  { icon: BookOpen, label: "Recipes", href: "/recipes" },
   { icon: Bot, label: "AI Scan", href: "/fridge-saver" },
-  { icon: Wallet, label: "Budget", href: "/expense-log" },
   { icon: User, label: "Profile", href: "/profile" },
 ]
 
-export function BottomNav() {
+type Props = {
+  onDashboard?: () => void
+}
+
+export function BottomNav({ onDashboard }: Props) {
   const router = useRouter()
   const pathname = usePathname()
+
+  const handleNav = (href: string) => {
+    if (href === "/dashboard" && onDashboard) {
+      onDashboard()
+    } else {
+      router.push(href)
+    }
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
@@ -23,7 +34,7 @@ export function BottomNav() {
           return (
             <button
               key={item.label}
-              onClick={() => router.push(item.href)}
+              onClick={() => handleNav(item.href)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all duration-200 active:scale-90 ${
                 isActive
                   ? "text-primary bg-primary-container/20"

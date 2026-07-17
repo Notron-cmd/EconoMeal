@@ -9,6 +9,137 @@ const recipes = new Hono<{ Variables: Variables }>()
 
 recipes.use("*", authMiddleware)
 
+// ====== Saved (user's personal recipes) – must be before /:id ======
+
+recipes.get("/saved", async (c) => {
+  const user = c.get("user")
+
+  const { data } = await supabase
+    .from("user_saved_recipes")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(5)
+
+  return c.json(data ?? [])
+})
+
+const bahanDetailSchema = z.object({
+  nama: z.string(),
+  berat: z.number(),
+  satuan: z.string(),
+  estimasi_harga: z.number(),
+})
+
+const saveMenuSchema = z.object({
+  nama: z.string(),
+  estimasi_harga: z.number(),
+  nutrisi: z.object({ kalori: z.number(), protein: z.number(), lemak: z.number(), karbohidrat: z.number() }),
+  bahan_utama: z.array(bahanDetailSchema).optional().default([]),
+  alat: z.array(z.string()).optional().default([]),
+  cara_singkat: z.string().optional().default(""),
+})
+
+recipes.post("/saved", zValidator("json", z.object({ menu: z.array(saveMenuSchema) })), async (c) => {
+  const user = c.get("user")
+  const body = c.req.valid("json")
+
+  const supabaseUrl = process.env.SUPABASE_URL!
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+  const { count } = await supabase
+    .from("user_saved_recipes")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+
+  const existingCount = count ?? 0
+  const newMenus = body.menu
+
+  if (existingCount + newMenus.length > 5) {
+    const toRemove = existingCount + newMenus.length - 5
+    const { data: oldest } = await supabase
+      .from("user_saved_recipes")
+      .select("id")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true })
+      .limit(toRemove)
+
+    if (oldest?.length) {
+      const ids = oldest.map((r) => r.id)
+      const dr = await fetch(`${supabaseUrl}/rest/v1/user_saved_recipes?id=in.(${ids.join(",")})`, {
+        method: "DELETE",
+        headers: { "apikey": serviceKey, "Authorization": `Bearer ${serviceKey}` },
+      })
+      if (!dr.ok) {
+        const errText = await dr.text()
+        console.error("Delete old recipes error:", dr.status, errText.slice(0, 300))
+      }
+    }
+  }
+
+  for (const menu of newMenus) {
+    const body: Record<string, unknown> = {
+      user_id: user.id,
+      nama: menu.nama,
+      estimasi_harga: menu.estimasi_harga,
+      nutrisi: menu.nutrisi,
+      bahan_utama: menu.bahan_utama,
+      cara_singkat: menu.cara_singkat,
+    }
+
+    let r = await fetch(`${supabaseUrl}/rest/v1/user_saved_recipes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": serviceKey,
+        "Authorization": `Bearer ${serviceKey}`,
+      },
+      body: JSON.stringify({ ...body, alat: menu.alat ?? [] }),
+    })
+
+    if (!r.ok) {
+      const errText = await r.text()
+      // Retry without alat if column is missing in the table
+      if (errText.includes("Could not find the 'alat' column")) {
+        console.warn("alat column missing, retrying without it")
+        r = await fetch(`${supabaseUrl}/rest/v1/user_saved_recipes`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": serviceKey,
+            "Authorization": `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify(body),
+        })
+      }
+      if (!r.ok) {
+        const errText2 = await r.text()
+        console.error("Save recipe Supabase error:", r.status, errText2.slice(0, 300))
+        return c.json({ error: `Gagal simpan "${menu.nama}": ${errText2.slice(0, 200)}` }, 400)
+      }
+    }
+  }
+
+  return c.json({ ok: true })
+})
+
+recipes.get("/saved/:id", async (c) => {
+  const user = c.get("user")
+  const id = c.req.param("id")
+
+  const { data } = await supabase
+    .from("user_saved_recipes")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single()
+
+  if (!data) return c.json({ error: "Saved recipe not found" }, 404)
+  return c.json(data)
+})
+
+// ====== Public recipes ======
+
 recipes.get("/", async (c) => {
   const user = c.get("user")
 

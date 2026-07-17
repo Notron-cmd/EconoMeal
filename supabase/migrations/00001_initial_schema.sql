@@ -1,5 +1,5 @@
 -- Enable UUID extension
-create extension if not exists "uuid-ossp";
+create extension if not exists "pgcrypto";
 
 -- 1. Profiles table (extends Supabase auth.users)
 create table if not exists public.profiles (
@@ -14,7 +14,7 @@ create table if not exists public.profiles (
 
 -- 2. User finances table
 create table if not exists public.user_finances (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   uang_bulanan numeric not null,
   target_tabungan numeric default 0,
@@ -39,7 +39,7 @@ create table if not exists public.regional_prices (
 
 -- 4. Expense logs
 create table if not exists public.expense_logs (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   amount numeric not null,
   meal_type text check (meal_type in ('breakfast', 'lunch', 'dinner', 'snack')),
@@ -49,7 +49,7 @@ create table if not exists public.expense_logs (
 
 -- 5. Saved recipes / meal history
 create table if not exists public.meal_history (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
   recipe_name text not null,
   ingredients jsonb,
