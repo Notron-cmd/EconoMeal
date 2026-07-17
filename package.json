@@ -9,15 +9,11 @@
     "dev": "pnpm --parallel -r run dev",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
-    "vercel-build": "echo 'build handled by Vercel functions'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "engines": {
     "node": ">=20"
-  },
-  "devDependencies": {
-    "hono": "^4.12.30"
   }
 }
