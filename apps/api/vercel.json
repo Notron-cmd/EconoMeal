@@ -1,7 +1,4 @@
 {
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
-  "outputDirectory": ".",
   "functions": {
     "api/[[route]].ts": {
       "runtime": "@vercel/node@4"
