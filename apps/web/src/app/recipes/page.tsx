@@ -40,7 +40,7 @@ export default function SavedRecipesPage() {
   const router = useRouter()
   const { data: recipes, isLoading } = useSavedRecipes()
   const [selectedRecipe, setSelectedRecipe] = useState<SavedRecipe | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; canRefund: boolean } | null>(null)
   const deleteRecipe = useDeleteSavedRecipe()
 
   return (
@@ -92,7 +92,8 @@ export default function SavedRecipesPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    setDeleteTarget(recipe.id)
+                    const idx = recipes?.findIndex((r: SavedRecipe) => r.id === recipe.id) ?? -1
+                    setDeleteTarget({ id: recipe.id, canRefund: idx === 0 || idx === 1 })
                   }}
                   disabled={deleteRecipe.isPending}
                   className="text-destructive/60 hover:text-destructive p-1 -mr-1 -mt-1 disabled:opacity-30"
@@ -132,13 +133,14 @@ export default function SavedRecipesPage() {
 
       <ConfirmOverlay
         open={deleteTarget !== null}
-        message="Hapus resep ini? Budget akan dikembalikan."
+        message={deleteTarget?.canRefund ? "Hapus resep ini? Budget akan dikembalikan." : "Hapus resep ini? Budget tidak akan dikembalikan karena bukan 2 resep terbaru."}
         onConfirm={() => {
-          if (deleteTarget) deleteRecipe.mutate(deleteTarget)
+          if (deleteTarget) deleteRecipe.mutate(deleteTarget.id)
           setDeleteTarget(null)
         }}
         onCancel={() => setDeleteTarget(null)}
         loading={deleteRecipe.isPending}
+        destructive={true}
       />
 
       <BottomNav />

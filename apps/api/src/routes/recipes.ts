@@ -151,6 +151,17 @@ recipes.delete("/saved/:id", async (c) => {
 
   if (fetchErr || !recipe) return c.json({ error: "Saved recipe not found" }, 404)
 
+  // Cek apakah resep ini termasuk 2 terbaru — hanya itu yang dapat refund
+  // Lakukan SEBELUM delete agar id masih ketemu di DB
+  const { data: recentRecipes } = await supabase
+    .from("user_saved_recipes")
+    .select("id, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(2)
+
+  const isRecent = recentRecipes?.some((r) => r.id === id)
+
   const { error: delErr } = await supabase
     .from("user_saved_recipes")
     .delete()
@@ -160,6 +171,10 @@ recipes.delete("/saved/:id", async (c) => {
   if (delErr) {
     console.error("Delete recipe error:", delErr)
     return c.json({ error: "Gagal menghapus resep" }, 400)
+  }
+
+  if (!isRecent) {
+    return c.json({ ok: true, refunded: false, reason: "bukan 2 resep terbaru" })
   }
 
   // Refund: subtract estimasi_harga from today's daily_spending
@@ -199,7 +214,7 @@ recipes.delete("/saved/:id", async (c) => {
     })
   }
 
-  return c.json({ ok: true })
+  return c.json({ ok: true, refunded: true })
 })
 
 // ====== Public recipes ======
